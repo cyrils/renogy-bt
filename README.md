@@ -13,7 +13,7 @@ pyhton3 ./example.py
 INFO:root:Adapter status - Powered: True
 INFO:root:Starting discovery...
 INFO:root:Devices found: 5
-INFO:root:Found bt1 device BT-TH-B00FEA2B  [80:6F:B0:0F:XX:XX]
+INFO:root:Found bt1 device BT-TH-B00FXX  [XX:6F:B0:0F:XX:XX]
 INFO:root:[80:6f:b0:0f:ea:2b] Discovered, alias = BT-TH-B00FXXXX
 INFO:root:[80:6F:B0:0F:EA:2B] Connected
 INFO:root:[80:6f:b0:0f:ea:2b] Discovered, alias = BT-TH-B00FXXXX
