@@ -1,16 +1,16 @@
 # Renogy BT-1
-Library to read Renogy RS232 compatible BT-1 bluetooth adapter. Tested with `Rover 40A` controller and `Raspberry Pi Zero 2 W`. It might also work with other  "SRNE like" devices like RichSolar, PowMr, WEIZE etc.
+Library to read Renogy RS232 compatible [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth adapter. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr, WEIZE etc.
 
 ## Example
 
 ```
 pyhton3 ./example.py
 ```
-Make sure to update mac_address and alias in `example.py`.
+Make sure to update `mac_address` and `alias` in example.py
 
 **How to get mac address?**
 
-Use any BLE scanner apps like [BLEScanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner) and look for devices with alias `BT-TH-XXXX`.
+Use any BLE scanner apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner) and look for devices with alias `BT-TH-XXXX..`
 
 **Output**
 
@@ -33,6 +33,10 @@ INFO:root:characteristic_enable_notifications_succeeded
 DEBUG:root:{'battery_percentage': 100, 'battery_voltage': 14.4, 'controller_temperature': 37, 'battery_temperature': 25, 'load_voltage': 14.4, 'load_current': 1.3, 'load_power': 1, 'pv_voltage': 19.2, 'pv_current': 5.26, 'pv_power': 101, 'max_charging_power_today': 276, 'max_discharging_power_today': 6, 'charging_amp_hours_today': 59, 'discharging_amp_hours_today': 2, 'power_generation_today': 797, 'power_generation_total': 10960}
 INFO:root:Gracefully exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 ```
+
+
+**Note:** This works best with cron jobs, ex: read every 5 mins. Its not designed for coninues real-time monitoring as it reads once and exits.
+
 
 ## Dependencies
 
