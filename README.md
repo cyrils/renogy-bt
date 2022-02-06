@@ -26,7 +26,7 @@ DEBUG:root:create_read_request 256 => [255, 3, 1, 0, 0, 30, 209, 224]
 INFO:root:characteristic_enable_notifications_succeeded
 INFO:root:characteristic_enable_notifications_succeeded
 DEBUG:root:{'battery_percentage': 100, 'battery_voltage': 14.4, 'controller_temperature': 37, 'battery_temperature': 25, 'load_voltage': 14.4, 'load_current': 1.3, 'load_power': 1, 'pv_voltage': 19.200000000000003, 'pv_current': 5.26, 'pv_power': 101, 'max_charging_power_today': 276, 'max_discharging_power_today': 6, 'charging_amp_hours_today': 59, 'discharging_amp_hours_today': 2, 'power_generation_today': 797, 'power_generation_total': 10960}
-INFO:root:Gracefully exit: Disconnecting device: BT-TH-B00FEA2B [80:6F:B0:0F:EA:2B]
+INFO:root:Gracefully exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 ```
 
 ## Dependencies
