@@ -1,5 +1,5 @@
-# renogy-bt1
-Library to read Renogy compatible BT-1 bluetooth adapter. Tested on Raspberry Pi Zero 2 W.
+# Renogy BT-1
+Library to read Renogy RS232 compatible BT-1 bluetooth adapter. Tested with `Rover 40A` controller and `Raspberry Pi Zero 2 W`. It might also work with other  "SRNE like" devices ie., RichSolar, PowMr, WEIZE etc.
 
 ## Example
 
