@@ -6,6 +6,11 @@ Library to read Renogy RS232 compatible BT-1 bluetooth adapter. Tested with `Rov
 ```
 pyhton3 ./example.py
 ```
+Make sure to update mac_address and alias in `example.py`.
+
+**How to get mac address?**
+
+Use any BLE scanner apps like [BLEScanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner) and look for devices with alias `BT-TH-XXXX`.
 
 **Output**
 
