@@ -1,5 +1,5 @@
 # Renogy BT-1
-Library to read Renogy RS232 compatible BT-1 bluetooth adapter. Tested with `Rover 40A` controller and `Raspberry Pi Zero 2 W`. It might also work with other  "SRNE like" devices ie., RichSolar, PowMr, WEIZE etc.
+Library to read Renogy RS232 compatible BT-1 bluetooth adapter. Tested with `Rover 40A` controller and `Raspberry Pi Zero 2 W`. It might also work with other  "SRNE like" devices like RichSolar, PowMr, WEIZE etc.
 
 ## Example
 
@@ -40,3 +40,9 @@ INFO:root:Gracefully exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:
 gatt
 libscrc
 ```
+
+## References
+
+ - [Olen/solar-monitor](https://github.com/Olen/solar-monitor)
+ - [corbinbs/solarshed](https://github.com/corbinbs/solarshed)
+ - [Rover 20A/40A Charge Controller—MODBUS Protocol](https://docs.google.com/document/d/1OSW3gluYNK8d_gSz4Bk89LMQ4ZrzjQY6/edit)
