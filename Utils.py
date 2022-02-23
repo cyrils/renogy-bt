@@ -1,5 +1,16 @@
-import logging                                                     
+import logging
+import string                                                     
 import libscrc
+
+CHARGING_STATE = {
+    0: 'deactivated',
+    1: 'activated',
+    2: 'mppt',
+    3: 'equalizing',
+    4: 'boost',
+    5: 'floating',
+    6: 'current limiting'
+}
 
 def Bytes2Int(bs, offset, length):
         # Reads data from a list of bytes, and converts to an int
@@ -56,7 +67,7 @@ def parse_charge_controller_info(bs):
     data['controller_temperature'] = Bytes2Int(bs, 9, 1)
     data['battery_temperature'] = Bytes2Int(bs, 10, 1)
     data['load_voltage'] = Bytes2Int(bs, 11, 2) * 0.1
-    data['load_current'] = Bytes2Int(bs, 13, 2) * 0.1
+    data['load_current'] = Bytes2Int(bs, 13, 2) * 0.01
     data['load_power'] = Bytes2Int(bs, 15, 2)
     data['pv_voltage'] = Bytes2Int(bs, 17, 2) * 0.1
     data['pv_current'] = Bytes2Int(bs, 19, 2) * 0.01
@@ -67,4 +78,7 @@ def parse_charge_controller_info(bs):
     data['discharging_amp_hours_today'] = Bytes2Int(bs, 39, 2)
     data['power_generation_today'] = Bytes2Int(bs, 41, 2)
     data['power_generation_total'] = Bytes2Int(bs, 59, 4)
+    chargin_status_code = Bytes2Int(bs, 67, 2) & 0x00ff
+    data['chargin_status'] = CHARGING_STATE[chargin_status_code]
+    
     return data

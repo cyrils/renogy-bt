@@ -6,10 +6,14 @@ from SolarDevice import SolarDeviceManager, SolarDevice
 from Utils import create_read_request, parse_charge_controller_info
 
 SYSTEM_TIMEOUT = 15 # exit program after this (seconds)
-DISCOVERY_TIMEOUT = 10 # max wait time to complete the scanning (seconds)
-DEVICE_ID = 255
-READ_OPERATION = 3
-WRITE_OPERATION = 6
+DISCOVERY_TIMEOUT = 10 # max wait time to complete the bluetooth scanning (seconds)
+
+READ_PARAMS = {
+    'DEVICE_ID': 255,
+    'FUNCTION': 3, # read: 3, write: 6
+    'REGISTER': 256,
+    'WORDS': 34
+}
 
 class BTOneApp:
     def __init__(self, adapter_name, mac_address, alias=None, data_callback=None):
@@ -32,22 +36,21 @@ class BTOneApp:
     def connect(self):
         discovering = True; wait = DISCOVERY_TIMEOUT; found = False;
 
-        if not found:
-            self.manager.update_devices()
-            logging.info("Starting discovery...")
-            self.manager.start_discovery()
+        self.manager.update_devices()
+        logging.info("Starting discovery...")
+        self.manager.start_discovery()
 
-            while discovering:
-                time.sleep(1)
-                logging.info("Devices found: %s", len(self.manager.devices()))
-                for dev in self.manager.devices():
-                    if dev.mac_address == self.mac_address or dev.alias() == self.alias:
-                        logging.info("Found bt1 device %s  [%s]", dev.alias(), dev.mac_address)
-                        discovering = False; found = True
-                wait = wait -1
-                if (wait <= 0):
-                    discovering = False
-            self.manager.stop_discovery()
+        while discovering:
+            time.sleep(1)
+            logging.info("Devices found: %s", len(self.manager.devices()))
+            for dev in self.manager.devices():
+                if dev.mac_address == self.mac_address or dev.alias() == self.alias:
+                    logging.info("Found bt1 device %s  [%s]", dev.alias(), dev.mac_address)
+                    discovering = False; found = True
+            wait = wait -1
+            if (wait <= 0):
+                discovering = False
+        self.manager.stop_discovery()
             
         if found:
             self._connect()
@@ -67,7 +70,7 @@ class BTOneApp:
 
     def on_resolved(self):
         logging.info("resolved services")
-        request = create_read_request(DEVICE_ID, READ_OPERATION, 256, 30)
+        request = create_read_request(READ_PARAMS["DEVICE_ID"], READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
         self.device.characteristic_write_value(request)
 
     def on_data_received(self, value):
@@ -82,7 +85,7 @@ class BTOneApp:
         if self.timer.is_alive():
             self.timer.cancel()
         if  self.device is not None and not connectFailed and self.device.is_connected():
-            logging.info("Gracefully exit: Disconnecting device: %s [%s]", self.device.alias(), self.device.mac_address)
+            logging.info("Exit: Disconnecting device: %s [%s]", self.device.alias(), self.device.mac_address)
             self.device.disconnect()
         self.manager.stop()
         os._exit(os.EX_OK)

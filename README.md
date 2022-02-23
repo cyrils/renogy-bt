@@ -14,11 +14,11 @@ INFO:root:Adapter status - Powered: True
 INFO:root:Starting discovery...
 INFO:root:Devices found: 5
 INFO:root:Found bt1 device BT-TH-B00FXXXX  [XX:6F:B0:0F:XX:XX]
-INFO:root:[80:6f:b0:0f:ea:2b] Discovered, alias = BT-TH-B00FXXXX
-INFO:root:[80:6F:B0:0F:EA:2B] Connected
-INFO:root:[80:6f:b0:0f:ea:2b] Discovered, alias = BT-TH-B00FXXXX
-INFO:root:[80:6f:b0:0f:ea:2b] Discovered, alias = BT-TH-B00FXXXX
-INFO:root:[80:6F:B0:0F:EA:2B] Resolved services
+INFO:root:[80:6f:b0:0f:xx:xx] Discovered, alias = BT-TH-B00FXXXX
+INFO:root:[80:6F:B0:0F:XX:XX] Connected
+INFO:root:[80:6f:b0:0f:xx:xx] Discovered, alias = BT-TH-B00FXXXX
+INFO:root:[80:6f:b0:0f:xx:xx] Discovered, alias = BT-TH-B00FXXXX
+INFO:root:[80:6F:B0:0F:XX:XX] Resolved services
 INFO:root:subscribed to notification 0000fff1-0000-1000-8000-00805f9b34fb
 INFO:root:found write characteristic 0000ffd1-0000-1000-8000-00805f9b34fb
 INFO:root:resolved services
