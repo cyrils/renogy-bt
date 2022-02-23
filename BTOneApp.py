@@ -16,11 +16,11 @@ READ_PARAMS = {
 }
 
 class BTOneApp:
-    def __init__(self, adapter_name, mac_address, alias=None, data_callback=None):
+    def __init__(self, adapter_name, mac_address, alias=None, on_data_received=None):
         self.adapter_name = adapter_name
         self.mac_address = mac_address
         self.alias = alias
-        self.data_callback = data_callback
+        self.data_callback = on_data_received
         self.device = None
         self.manager = SolarDeviceManager(adapter_name=adapter_name)
         self.device = SolarDevice(mac_address=mac_address, manager=self.manager, on_resolved=self.on_resolved, on_data=self.on_data_received)

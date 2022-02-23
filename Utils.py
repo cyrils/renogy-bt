@@ -78,7 +78,7 @@ def parse_charge_controller_info(bs):
     data['discharging_amp_hours_today'] = Bytes2Int(bs, 39, 2)
     data['power_generation_today'] = Bytes2Int(bs, 41, 2)
     data['power_generation_total'] = Bytes2Int(bs, 59, 4)
-    chargin_status_code = Bytes2Int(bs, 67, 2) & 0x00ff
-    data['chargin_status'] = CHARGING_STATE[chargin_status_code]
+    charging_status_code = Bytes2Int(bs, 67, 2) & 0x00ff
+    data['charging_status'] = CHARGING_STATE[charging_status_code]
     
     return data
