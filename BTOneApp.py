@@ -3,29 +3,34 @@ import os
 import logging 
 import time
 from SolarDevice import SolarDeviceManager, SolarDevice
-from Utils import create_read_request, parse_charge_controller_info
+from Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, Bytes2Int
 
-SYSTEM_TIMEOUT = 15 # exit program after this (seconds)
 DISCOVERY_TIMEOUT = 10 # max wait time to complete the bluetooth scanning (seconds)
+DEVICE_ID = 255
+POLL_INTERVAL = 30 # seconds
 
 READ_PARAMS = {
-    'DEVICE_ID': 255,
-    'FUNCTION': 3, # read: 3, write: 6
+    'FUNCTION': 3,
     'REGISTER': 256,
     'WORDS': 34
 }
 
+WRITE_PARAMS_LOAD = {
+    'FUNCTION': 6,
+    'REGISTER': 266
+}
+
 class BTOneApp:
-    def __init__(self, adapter_name, mac_address, alias=None, on_data_received=None):
+    def __init__(self, adapter_name, mac_address, alias=None, on_connected=None, on_data_received=None, interval = POLL_INTERVAL):
         self.adapter_name = adapter_name
         self.mac_address = mac_address
         self.alias = alias
-        self.data_callback = on_data_received
-        self.device = None
+        self.connected_callback = on_connected
+        self.data_received_callback = on_data_received
         self.manager = SolarDeviceManager(adapter_name=adapter_name)
-        self.device = SolarDevice(mac_address=mac_address, manager=self.manager, on_resolved=self.on_resolved, on_data=self.on_data_received)
-        self.timer = Timer(SYSTEM_TIMEOUT, self.gracefully_exit)
-        self.timer.start()
+        self.device = SolarDevice(mac_address=mac_address, manager=self.manager, on_resolved=self.__on_resolved, on_data=self.__on_data_received)
+        self.timer = None
+        self.interval = interval
         self.data = {}
 
         if not self.manager.is_adapter_powered:
@@ -53,36 +58,61 @@ class BTOneApp:
         self.manager.stop_discovery()
             
         if found:
-            self._connect()
+            self.__connect()
         else:
             logging.error("Device not found: [%s], please check the details provided.", self.mac_address)
-            self.gracefully_exit(True)
+            self.__gracefully_exit(True)
 
-    def _connect(self):
+    def __connect(self):
         try:
             self.device.connect()
             self.manager.run()
         except Exception as e:
             logging.error(e)
-            self.gracefully_exit(True)
+            self.__gracefully_exit(True)
         except KeyboardInterrupt:
-            self.gracefully_exit()
+            self.__gracefully_exit()
 
-    def on_resolved(self):
+    def __on_resolved(self):
         logging.info("resolved services")
-        request = create_read_request(READ_PARAMS["DEVICE_ID"], READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
+        if self.connected_callback is not None:
+            self.connected_callback(self)
+
+    def __on_data_received(self, value):
+        operation = Bytes2Int(value, 1, 1)
+
+        if operation == 3:
+            logging.info("on_data_received: response for read operation")
+            self.data = parse_charge_controller_info(value)
+            if self.data_received_callback is not None:
+                self.data_received_callback(self, self.data)
+        elif operation == 6:
+            self.data = parse_set_load_response(value)
+            logging.info("on_data_received: response for write operation")
+            if self.data_received_callback is not None:
+                self.data_received_callback(self, self.data)
+        else:
+            logging.warn("on_data_received: unknown operation={}.format(operation)")
+
+    def poll_params(self):
+        self.__read_params()
+        if self.timer is not None and self.timer.is_alive():
+            self.timer.cancel()
+        self.timer = Timer(self.interval, self.poll_params)
+        self.timer.start()
+
+    def __read_params(self):
+        logging.info("reading params")
+        request = create_request_payload(DEVICE_ID, READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
         self.device.characteristic_write_value(request)
 
-    def on_data_received(self, value):
-        data = parse_charge_controller_info(value)
-        for key in data:
-            self.data[key] = data[key]
+    def set_load(self, value = 0):
+        logging.info("setting load {}".format(value))
+        request = create_request_payload(DEVICE_ID, WRITE_PARAMS_LOAD["FUNCTION"], WRITE_PARAMS_LOAD["REGISTER"], value)
+        self.device.characteristic_write_value(request)
 
-        if self.data_callback is not None:
-            self.data_callback(self.data)
-
-    def gracefully_exit(self, connectFailed = False):
-        if self.timer.is_alive():
+    def __gracefully_exit(self, connectFailed = False):
+        if self.timer is not None and self.timer.is_alive():
             self.timer.cancel()
         if  self.device is not None and not connectFailed and self.device.is_connected():
             logging.info("Exit: Disconnecting device: %s [%s]", self.device.alias(), self.device.mac_address)
@@ -90,4 +120,5 @@ class BTOneApp:
         self.manager.stop()
         os._exit(os.EX_OK)
 
-
+    def disconnect(self):
+        self.__gracefully_exit()

@@ -1,5 +1,4 @@
 import logging
-import string                                                     
 import libscrc
 
 CHARGING_STATE = {
@@ -10,6 +9,11 @@ CHARGING_STATE = {
     4: 'boost',
     5: 'floating',
     6: 'current limiting'
+}
+
+FUNCTION = {
+    3: "READ",
+    6: "WRITE"
 }
 
 def Bytes2Int(bs, offset, length):
@@ -42,7 +46,7 @@ def Int2Bytes(i, pos = 0):
     return 0
 
 
-def create_read_request(device_id, function, regAddr, readWrd):                             
+def create_request_payload(device_id, function, regAddr, readWrd):                             
     data = None                                
 
     if regAddr:
@@ -59,9 +63,11 @@ def create_read_request(device_id, function, regAddr, readWrd):
         data.append(Int2Bytes(crc, 0))
         logging.debug("{} {} => {}".format("create_read_request", regAddr, data))
     return data
+    
 
 def parse_charge_controller_info(bs):
     data = {}
+    data['function'] = FUNCTION[Bytes2Int(bs, 1, 1)]
     data['battery_percentage'] = Bytes2Int(bs, 3, 2)
     data['battery_voltage'] = Bytes2Int(bs, 5, 2) * 0.1
     data['controller_temperature'] = Bytes2Int(bs, 9, 1)
@@ -81,4 +87,11 @@ def parse_charge_controller_info(bs):
     charging_status_code = Bytes2Int(bs, 67, 2) & 0x00ff
     data['charging_status'] = CHARGING_STATE[charging_status_code]
     
+    return data
+
+
+def parse_set_load_response(bs):
+    data = {}
+    data['function'] = FUNCTION[Bytes2Int(bs, 1, 1)]
+    data['load_status'] = Bytes2Int(bs, 5, 1)
     return data

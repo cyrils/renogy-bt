@@ -67,7 +67,7 @@ class SolarDevice(gatt.Device):
 
     def characteristic_write_value_succeeded(self, characteristic):
         super().characteristic_write_value_succeeded(characteristic)
-        logging.info('characteristic_enable_notifications_succeeded')
+        logging.info('characteristic_write_value_succeeded')
         self.writing = False
 
     def characteristic_write_value_failed(self, characteristic, error):
