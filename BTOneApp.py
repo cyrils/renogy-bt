@@ -31,10 +31,6 @@ class BTOneApp:
         self.interval = interval
         self.data = {}
 
-        if not self.manager.is_adapter_powered:
-            self.manager.is_adapter_powered = True
-        logging.info("Adapter status - Powered: {}".format(self.manager.is_adapter_powered))
-
     def connect(self):
         self.device.connect()
 
