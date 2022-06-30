@@ -35,9 +35,6 @@ INFO:root:Gracefully exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:
 ```
 
 
-**Note:** This works best with cron jobs, ex: read every 5 mins. Its not designed for coninues real-time monitoring as it reads once and exits. If you want ral-time monitoring, check this branch [real-time](https://github.com/cyrils/renogy-bt1/tree/real-time).
-
-
 ## Dependencies
 
 ```

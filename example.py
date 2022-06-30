@@ -3,13 +3,18 @@ from BTOneApp import BTOneApp
 
 logging.basicConfig(level=logging.DEBUG)
 
-def data_callback(data):
-    logging.debug(data)
-
 MAC_ADDR = "80:6F:B0:0F:XX:XX"
 DEVICE_ALIAS = "BT-TH-B00FXXXX"
+POLL_INTERVAL = 30 # seconds
 
-bt1 = BTOneApp("hci0", MAC_ADDR, DEVICE_ALIAS, data_callback)
+def on_connected(app: BTOneApp):
+    app.poll_params() # OR app.set_load(1)
+
+def on_data_received(app: BTOneApp, data):
+    logging.debug("{} => {}".format(app.alias, data))
+    # app.disconnect() # disconnect here if you do not want polling
+
+bt1 = BTOneApp("hci0", MAC_ADDR, DEVICE_ALIAS, on_connected, on_data_received, POLL_INTERVAL)
 bt1.connect()
 
 
