@@ -6,7 +6,7 @@ Library to read Renogy RS232 compatible [BT-1](https://www.renogy.com/bt-1-bluet
 ```
 pyhton3 ./example.py
 ```
-Make sure to update `mac_address` and `alias` in example.py
+Make sure to update `mac_address` and `alias` in example.py. It has APIs to continuously read data or turn on/off load.
 
 **How to get mac address?**
 
