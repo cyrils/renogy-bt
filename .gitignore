@@ -2,4 +2,5 @@ batch-push.py
 solar-reader.py
 *.pyc
 .vscode/sftp.json
-*.pyc
+RelayApp.py
+relay.py

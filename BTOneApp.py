@@ -1,13 +1,13 @@
 from threading import Timer
-import os
 import logging 
-import time
-from SolarDevice import SolarDeviceManager, SolarDevice
+from BLE import DeviceManager, Device
 from Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, Bytes2Int
 
-DISCOVERY_TIMEOUT = 10 # max wait time to complete the bluetooth scanning (seconds)
 DEVICE_ID = 255
 POLL_INTERVAL = 30 # seconds
+
+NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
+WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
 
 READ_PARAMS = {
     'FUNCTION': 3,
@@ -23,55 +23,16 @@ WRITE_PARAMS_LOAD = {
 class BTOneApp:
     def __init__(self, adapter_name, mac_address, alias=None, on_connected=None, on_data_received=None, interval = POLL_INTERVAL):
         self.adapter_name = adapter_name
-        self.mac_address = mac_address
-        self.alias = alias
         self.connected_callback = on_connected
         self.data_received_callback = on_data_received
-        self.manager = SolarDeviceManager(adapter_name=adapter_name)
-        self.device = SolarDevice(mac_address=mac_address, manager=self.manager, on_resolved=self.__on_resolved, on_data=self.__on_data_received)
+        self.manager = DeviceManager(adapter_name=adapter_name)
+        self.device = Device(mac_address=mac_address, alias=alias, manager=self.manager, on_resolved=self.__on_resolved, on_data=self.__on_data_received, notify_uuid=NOTIFY_CHAR_UUID, write_uuid=WRITE_CHAR_UUID)
         self.timer = None
         self.interval = interval
         self.data = {}
 
-        if not self.manager.is_adapter_powered:
-            self.manager.is_adapter_powered = True
-        logging.info("Adapter status - Powered: {}".format(self.manager.is_adapter_powered))
-
-
     def connect(self):
-        discovering = True; wait = DISCOVERY_TIMEOUT; found = False;
-
-        self.manager.update_devices()
-        logging.info("Starting discovery...")
-        self.manager.start_discovery()
-
-        while discovering:
-            time.sleep(1)
-            logging.info("Devices found: %s", len(self.manager.devices()))
-            for dev in self.manager.devices():
-                if dev.mac_address == self.mac_address or dev.alias() == self.alias:
-                    logging.info("Found bt1 device %s  [%s]", dev.alias(), dev.mac_address)
-                    discovering = False; found = True
-            wait = wait -1
-            if (wait <= 0):
-                discovering = False
-        self.manager.stop_discovery()
-            
-        if found:
-            self.__connect()
-        else:
-            logging.error("Device not found: [%s], please check the details provided.", self.mac_address)
-            self.__gracefully_exit(True)
-
-    def __connect(self):
-        try:
-            self.device.connect()
-            self.manager.run()
-        except Exception as e:
-            logging.error(e)
-            self.__gracefully_exit(True)
-        except KeyboardInterrupt:
-            self.__gracefully_exit()
+        self.device.connect()
 
     def __on_resolved(self):
         logging.info("resolved services")
@@ -111,14 +72,7 @@ class BTOneApp:
         request = create_request_payload(DEVICE_ID, WRITE_PARAMS_LOAD["FUNCTION"], WRITE_PARAMS_LOAD["REGISTER"], value)
         self.device.characteristic_write_value(request)
 
-    def __gracefully_exit(self, connectFailed = False):
+    def disconnect(self):
         if self.timer is not None and self.timer.is_alive():
             self.timer.cancel()
-        if  self.device is not None and not connectFailed and self.device.is_connected():
-            logging.info("Exit: Disconnecting device: %s [%s]", self.device.alias(), self.device.mac_address)
-            self.device.disconnect()
-        self.manager.stop()
-        os._exit(os.EX_OK)
-
-    def disconnect(self):
-        self.__gracefully_exit()
+        self.device.disconnect()
