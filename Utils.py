@@ -11,6 +11,11 @@ CHARGING_STATE = {
     6: 'current limiting'
 }
 
+LOAD_STATE = {
+  0: 'off',
+  1: 'on'
+}
+
 FUNCTION = {
     3: "READ",
     6: "WRITE"
@@ -72,6 +77,8 @@ def parse_charge_controller_info(bs):
     data['battery_voltage'] = Bytes2Int(bs, 5, 2) * 0.1
     data['controller_temperature'] = Bytes2Int(bs, 9, 1)
     data['battery_temperature'] = Bytes2Int(bs, 10, 1)
+    load_status = Bytes2Int(bs, 67, 1) >> 7
+    data['load_status'] = LOAD_STATE[load_status]
     data['load_voltage'] = Bytes2Int(bs, 11, 2) * 0.1
     data['load_current'] = Bytes2Int(bs, 13, 2) * 0.01
     data['load_power'] = Bytes2Int(bs, 15, 2)
@@ -84,7 +91,7 @@ def parse_charge_controller_info(bs):
     data['discharging_amp_hours_today'] = Bytes2Int(bs, 39, 2)
     data['power_generation_today'] = Bytes2Int(bs, 41, 2)
     data['power_generation_total'] = Bytes2Int(bs, 59, 4)
-    charging_status_code = Bytes2Int(bs, 67, 2) & 0x00ff
+    charging_status_code = Bytes2Int(bs, 68, 1)
     data['charging_status'] = CHARGING_STATE[charging_status_code]
     
     return data
