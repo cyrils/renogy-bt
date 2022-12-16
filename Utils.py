@@ -68,7 +68,6 @@ def create_request_payload(device_id, function, regAddr, readWrd):
         data.append(Int2Bytes(crc, 0))
         logging.debug("{} {} => {}".format("create_read_request", regAddr, data))
     return data
-    
 
 def parse_charge_controller_info(bs):
     data = {}
@@ -76,10 +75,9 @@ def parse_charge_controller_info(bs):
     data['battery_percentage'] = Bytes2Int(bs, 3, 2)
     data['battery_voltage'] = Bytes2Int(bs, 5, 2) * 0.1
     data['battery_current'] = Bytes2Int(bs, 7, 2) * 0.01
-    data['battery_temperature'] = Bytes2Int(bs, 10, 1)
-    data['controller_temperature'] = Bytes2Int(bs, 9, 1)
-    load_status = Bytes2Int(bs, 67, 1) >> 7
-    data['load_status'] = LOAD_STATE[load_status]
+    data['battery_temperature'] = parse_temperature(Bytes2Int(bs, 10, 1))
+    data['controller_temperature'] = parse_temperature(Bytes2Int(bs, 9, 1))
+    data['load_status'] = LOAD_STATE[Bytes2Int(bs, 67, 1) >> 7]
     data['load_voltage'] = Bytes2Int(bs, 11, 2) * 0.1
     data['load_current'] = Bytes2Int(bs, 13, 2) * 0.01
     data['load_power'] = Bytes2Int(bs, 15, 2)
@@ -93,14 +91,15 @@ def parse_charge_controller_info(bs):
     data['power_generation_today'] = Bytes2Int(bs, 41, 2)
     data['power_consumption_today'] = Bytes2Int(bs, 43, 2)
     data['power_generation_total'] = Bytes2Int(bs, 59, 4)
-    charging_status_code = Bytes2Int(bs, 68, 1)
-    data['charging_status'] = CHARGING_STATE[charging_status_code]
-    
+    data['charging_status'] = CHARGING_STATE[Bytes2Int(bs, 68, 1)]
     return data
-
 
 def parse_set_load_response(bs):
     data = {}
     data['function'] = FUNCTION[Bytes2Int(bs, 1, 1)]
     data['load_status'] = Bytes2Int(bs, 5, 1)
     return data
+
+def parse_temperature(raw_value):
+    sign = raw_value >> 7
+    return -(raw_value - 128) if sign == 1 else raw_value
