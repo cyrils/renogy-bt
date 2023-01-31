@@ -2,7 +2,7 @@ import os
 from threading import Timer
 import logging
 import configparser
-from BLE import DeviceManager, Device
+from lib.BLE import DeviceManager, Device
 from lib.Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, bytes_to_int
 from lib.DataLogger import DataLogger
 
