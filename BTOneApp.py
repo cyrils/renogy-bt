@@ -25,7 +25,7 @@ WRITE_PARAMS_LOAD = {
 
 class BTOneApp:
     def __init__(self, config, on_data_callback=None):
-        self.config = config
+        self.config: configparser.ConfigParser = config
         self.on_data_callback = on_data_callback
         self.manager = None
         self.device = None
@@ -46,7 +46,7 @@ class BTOneApp:
 
     def __on_resolved(self):
         logging.info("resolved services")
-        self.poll_params() if self.config['device']['poll_data'] == True else self.__read_params()
+        self.poll_params() if self.config['device'].getboolean('poll_data') == True else self.__read_params()
 
     def __on_data_received(self, value):
         operation = Bytes2Int(value, 1, 1)
@@ -68,7 +68,7 @@ class BTOneApp:
         self.__read_params()
         if self.timer is not None and self.timer.is_alive():
             self.timer.cancel()
-        self.timer = Timer(self.config['device']['poll_interval'], self.poll_params)
+        self.timer = Timer(self.config['device'].getint('poll_interval'), self.poll_params)
         self.timer.start()
 
     def __read_params(self):
@@ -83,17 +83,17 @@ class BTOneApp:
 
     def __on_error(self, connectFailed = False, error = None):
         logging.error(f"Exception occured: {error}")
-        self.__stop() if connectFailed else self.disconnect()
+        self.__stop_service() if connectFailed else self.disconnect()
 
     def __on_connect_fail(self, error):
         logging.error(f"Connection failed: {error}")
-        self.__stop()
+        self.__stop_service()
 
     def disconnect(self):
         self.device.disconnect()
-        self.__stop()
+        self.__stop_service()
 
-    def __stop(self):
+    def __stop_service(self):
         if self.timer is not None and self.timer.is_alive():
             self.timer.cancel()
         self.manager.stop()
@@ -102,10 +102,13 @@ class BTOneApp:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
+
+    app: BTOneApp= None
     config = configparser.ConfigParser()
     config.read('config.ini')
     data_logger: DataLogger = DataLogger(config)
-    app: BTOneApp= None
+    # data_logger.log_mqtt({'hello': True})
+    # data_logger.log_remote({'hello': False})
 
     def on_data_received(data):
         logging.debug("{} => {}".format(app.device.alias(), data))
