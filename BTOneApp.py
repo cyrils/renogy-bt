@@ -107,8 +107,6 @@ if __name__ == "__main__":
     config = configparser.ConfigParser()
     config.read('config.ini')
     data_logger: DataLogger = DataLogger(config)
-    # data_logger.log_mqtt({'hello': True})
-    # data_logger.log_remote({'hello': False})
 
     def on_data_received(data):
         logging.debug("{} => {}".format(app.device.alias(), data))

@@ -45,6 +45,7 @@ class DeviceManager(gatt.DeviceManager):
             os._exit(os.EX_SOFTWARE)
 
     def device_discovered(self, device):
+        super.device_discovered(device)
         logging.info("[{}] Discovered, alias = {}".format(device.mac_address, device.alias()))
 
 
@@ -58,9 +59,6 @@ class Device(gatt.Device):
         self.notify_char_uuid = notify_uuid
         self.write_char_uuid = write_uuid
         self.mac_address = mac_address
-
-    def connect(self):
-        super().connect()
 
     def connect_succeeded(self):
         super().connect_succeeded()
