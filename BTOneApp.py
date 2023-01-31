@@ -3,7 +3,7 @@ from threading import Timer
 import logging
 import configparser
 from BLE import DeviceManager, Device
-from Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, Bytes2Int
+from lib.Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, bytes_to_int
 from lib.DataLogger import DataLogger
 
 DEVICE_ID = 255
@@ -49,7 +49,7 @@ class BTOneApp:
         self.poll_params() if self.config['device'].getboolean('poll_data') == True else self.__read_params()
 
     def __on_data_received(self, value):
-        operation = Bytes2Int(value, 1, 1)
+        operation = bytes_to_int(value, 1, 1)
 
         if operation == 3:
             logging.info("on_data_received: response for read operation")

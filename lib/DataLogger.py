@@ -7,7 +7,6 @@ import paho.mqtt.publish as publish
 class DataLogger:
     def __init__(self, config: ConfigParser):
         self.config = config
-        self.adapter_name = self.config['device']['adapter']
 
     def log_remote(self, json_data):
         headers = { "Authorization" : f"Bearer {self.config['remote_logging']['auth_header']}" }
