@@ -11,7 +11,7 @@ To obtain the full code, including examples and documentation, you can clone the
 git clone https://github.com/cyrils/renogy-bt1.git
 ```
 ## Example
-Make sure to update `config.ini` with correct values for `mac_addr` and `alias`. There are options for MQTT and custom logging to your server.
+Make sure to update `config.ini` with correct values for `mac_addr` and `alias` and run the following command:
 
 ```sh
 python3 ./example.py
@@ -19,7 +19,7 @@ python3 ./example.py
 
 **How to get mac address?**
 
-Run the above command and look for discovered devices nearby with alias `BT-TH-XXXX..`
+Run the above example command and look for nearby devices discovered with alias `BT-TH-XXXX..` There are options in config.ini for MQTT and custom logging to your server.
 
 **Output**
 

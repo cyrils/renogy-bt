@@ -21,7 +21,7 @@ class DeviceManager(gatt.DeviceManager):
         discovering = True; wait = DISCOVERY_TIMEOUT; device_found = False;
 
         self.update_devices()
-        logging.info(f"Starting discovery...{self.mac_address}")
+        logging.info("Starting discovery...")
         self.start_discovery()
 
         while discovering:
@@ -29,7 +29,7 @@ class DeviceManager(gatt.DeviceManager):
             logging.info("Devices found: %s", len(self.devices()))
             for dev in self.devices():
                 if (dev.mac_address == self.mac_address or dev.alias() == self.device_alias) and discovering:
-                    logging.info("Found bt1 device %s => [%s]", dev.alias(), dev.mac_address)
+                    logging.info("Found matching device %s => [%s]", dev.alias(), dev.mac_address)
                     discovering = False; device_found = True
             wait = wait -1
             if (wait <= 0):

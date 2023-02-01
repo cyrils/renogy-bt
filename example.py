@@ -18,6 +18,6 @@ def on_data_received(client, data):
     if client.config['device']['poll_data'] != True:
         client.disconnect()
 
-logging.info(f"Starting client, config: {config['device']['alias']} => {config['device']['mac_addr']}")
+logging.info(f"Starting client: {config['device']['alias']} => {config['device']['mac_addr']}")
 
 BTOneClient(config, on_data_received).connect()

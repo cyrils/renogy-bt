@@ -98,25 +98,3 @@ class BTOneClient:
             self.timer.cancel()
         self.manager.stop()
         os._exit(os.EX_OK)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-
-    app: BTOneClient= None
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    data_logger: DataLogger = DataLogger(config)
-
-    def on_data_received(data):
-        logging.debug("{} => {}".format(app.device.alias(), data))
-        if app.config['remote_logging']['enabled'] == True:
-            data_logger.log_remote(json_data=data)
-        if app.config['mqtt']['enabled'] == True:
-            data_logger.log_mqtt(json_data=data)
-        if app.config['device']['poll_data'] != True:
-            app.disconnect()
-
-    logging.info(f"Starting app, config: {config['device']['alias']} => {config['device']['mac_addr']}")
-    app = BTOneClient(config, on_data_received)
-    app.connect()
