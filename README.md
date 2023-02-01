@@ -19,7 +19,7 @@ python3 ./src/rng-bt1/BTOneApp.py
 
 **How to get mac address?**
 
-Run the above command and look for discovered devices nearby with alias `BT-TH-XXXX..`. Alternatively you can use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner) 
+Run the above command and look for discovered devices nearby with alias `BT-TH-XXXX..`
 
 **Output**
 
