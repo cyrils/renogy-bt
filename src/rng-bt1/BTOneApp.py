@@ -2,9 +2,9 @@ import os
 from threading import Timer
 import logging
 import configparser
-from lib.BLE import DeviceManager, Device
-from lib.Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, bytes_to_int
-from lib.DataLogger import DataLogger
+from BLE import DeviceManager, Device
+from Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, bytes_to_int
+from DataLogger import DataLogger
 
 DEVICE_ID = 255
 POLL_INTERVAL = 30 # seconds
@@ -44,6 +44,27 @@ class BTOneApp:
         except KeyboardInterrupt:
             self.__on_error()
 
+    def disconnect(self):
+        self.device.disconnect()
+        self.__stop_service()
+
+    def set_load(self, value = 0):
+        logging.info("setting load {}".format(value))
+        request = create_request_payload(DEVICE_ID, WRITE_PARAMS_LOAD["FUNCTION"], WRITE_PARAMS_LOAD["REGISTER"], value)
+        self.device.characteristic_write_value(request)
+
+    def poll_params(self):
+        self.__read_params()
+        if self.timer is not None and self.timer.is_alive():
+            self.timer.cancel()
+        self.timer = Timer(self.config['device'].getint('poll_interval'), self.poll_params)
+        self.timer.start()
+
+    def __read_params(self):
+        logging.info("reading params")
+        request = create_request_payload(DEVICE_ID, READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
+        self.device.characteristic_write_value(request)
+
     def __on_resolved(self):
         logging.info("resolved services")
         self.poll_params() if self.config['device'].getboolean('poll_data') == True else self.__read_params()
@@ -64,33 +85,12 @@ class BTOneApp:
         else:
             logging.warn("on_data_received: unknown operation={}.format(operation)")
 
-    def poll_params(self):
-        self.__read_params()
-        if self.timer is not None and self.timer.is_alive():
-            self.timer.cancel()
-        self.timer = Timer(self.config['device'].getint('poll_interval'), self.poll_params)
-        self.timer.start()
-
-    def __read_params(self):
-        logging.info("reading params")
-        request = create_request_payload(DEVICE_ID, READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
-        self.device.characteristic_write_value(request)
-
-    def set_load(self, value = 0):
-        logging.info("setting load {}".format(value))
-        request = create_request_payload(DEVICE_ID, WRITE_PARAMS_LOAD["FUNCTION"], WRITE_PARAMS_LOAD["REGISTER"], value)
-        self.device.characteristic_write_value(request)
-
     def __on_error(self, connectFailed = False, error = None):
         logging.error(f"Exception occured: {error}")
         self.__stop_service() if connectFailed else self.disconnect()
 
     def __on_connect_fail(self, error):
         logging.error(f"Connection failed: {error}")
-        self.__stop_service()
-
-    def disconnect(self):
-        self.device.disconnect()
         self.__stop_service()
 
     def __stop_service(self):
