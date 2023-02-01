@@ -2,9 +2,9 @@ import os
 from threading import Timer
 import logging
 import configparser
-from BLE import DeviceManager, Device
-from Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, bytes_to_int
-from DataLogger import DataLogger
+from .BLE import DeviceManager, Device
+from .Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, bytes_to_int
+from .DataLogger import DataLogger
 
 DEVICE_ID = 255
 POLL_INTERVAL = 30 # seconds
@@ -23,7 +23,7 @@ WRITE_PARAMS_LOAD = {
     'REGISTER': 266
 }
 
-class BTOneApp:
+class BTOneClient:
     def __init__(self, config, on_data_callback=None):
         self.config: configparser.ConfigParser = config
         self.on_data_callback = on_data_callback
@@ -76,12 +76,12 @@ class BTOneApp:
             logging.info("on_data_received: response for read operation")
             self.data = parse_charge_controller_info(value)
             if self.on_data_callback is not None:
-                self.on_data_callback(self.data)
+                self.on_data_callback(self, self.data)
         elif operation == 6:
             self.data = parse_set_load_response(value)
             logging.info("on_data_received: response for write operation")
             if self.on_data_callback is not None:
-                self.on_data_callback(self.data)
+                self.on_data_callback(self, self.data)
         else:
             logging.warn("on_data_received: unknown operation={}.format(operation)")
 
@@ -103,7 +103,7 @@ class BTOneApp:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
-    app: BTOneApp= None
+    app: BTOneClient= None
     config = configparser.ConfigParser()
     config.read('config.ini')
     data_logger: DataLogger = DataLogger(config)
@@ -118,5 +118,5 @@ if __name__ == "__main__":
             app.disconnect()
 
     logging.info(f"Starting app, config: {config['device']['alias']} => {config['device']['mac_addr']}")
-    app = BTOneApp(config, on_data_received)
+    app = BTOneClient(config, on_data_received)
     app.connect()

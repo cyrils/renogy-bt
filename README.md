@@ -4,17 +4,17 @@ Python library to read Renogy RS232 compatible [BT-1](https://www.renogy.com/bt-
 ## Installation
 
 ```
-pip3 install rng-bt1
+pip3 install renogybtone
 ``` 
 To obtain the full code, including examples and documentation, you can clone the git repository:
 ```
 git clone https://github.com/cyrils/renogy-bt1.git
 ```
 ## Example
-Make sure to update `config.ini` with correct values for `mac_addr` and `alias`. If you want to use it as a module, take a look at the examples provided.
+Make sure to update `config.ini` with correct values for `mac_addr` and `alias`. There are options for MQTT and custom logging to your server.
 
-```
-python3 ./src/rng-bt1/BTOneApp.py
+```sh
+python3 ./example.py
 ```
 
 **How to get mac address?**
