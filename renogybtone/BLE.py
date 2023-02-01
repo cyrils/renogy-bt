@@ -6,19 +6,18 @@ import os
 DISCOVERY_TIMEOUT = 5 # max wait time to complete the bluetooth scanning (seconds)
 
 class DeviceManager(gatt.DeviceManager):
-    def __init__(self, adapter_name, mac_address, alias, alias_prefix):
+    def __init__(self, adapter_name, mac_address, alias):
         super(). __init__(adapter_name)
         self.device_found = False
         self.mac_address = mac_address
         self.device_alias = alias
-        self.alias_prefix = alias_prefix
 
         if not self.is_adapter_powered:
             self.is_adapter_powered = True
         logging.info("Adapter status - Powered: {}".format(self.is_adapter_powered))
 
     def discover(self):
-        discovering = True; wait = DISCOVERY_TIMEOUT; device_found = False;
+        discovering = True; wait = DISCOVERY_TIMEOUT; self.device_found = False;
 
         self.update_devices()
         logging.info("Starting discovery...")
@@ -30,19 +29,11 @@ class DeviceManager(gatt.DeviceManager):
             for dev in self.devices():
                 if (dev.mac_address == self.mac_address or dev.alias() == self.device_alias) and discovering:
                     logging.info("Found matching device %s => [%s]", dev.alias(), dev.mac_address)
-                    discovering = False; device_found = True
+                    discovering = False; self.device_found = True
             wait = wait -1
             if (wait <= 0):
                 discovering = False
         self.stop_discovery()
-
-        if not device_found:
-            logging.error(f"Device not found: {self.device_alias} => {self.mac_address}, please check the details provided.")
-            for dev in self.devices():
-                if self.alias_prefix is not None and dev.alias() != None and dev.alias().startswith(self.alias_prefix):
-                    logging.info(f"Possible device: {dev.mac_address} => {dev.alias()}")
-            self.stop()
-            os._exit(os.EX_SOFTWARE)
 
     def device_discovered(self, device):
         super.device_discovered(device)

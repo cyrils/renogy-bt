@@ -4,10 +4,10 @@ import logging
 import configparser
 from .BLE import DeviceManager, Device
 from .Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, bytes_to_int
-from .DataLogger import DataLogger
 
 DEVICE_ID = 255
 POLL_INTERVAL = 30 # seconds
+ALIAS_PREFIX = 'BT-TH'
 
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
@@ -33,9 +33,18 @@ class BTOneClient:
         self.data = {}
 
     def connect(self):
-        self.manager = DeviceManager(adapter_name=self.config['device']['adapter'], mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], alias_prefix=self.config['device']['alias_prefix'])
+        self.manager = DeviceManager(adapter_name=self.config['device']['adapter'], mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'])
         self.manager.discover()
+
+        if not self.manager.device_found:
+            logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
+            for dev in self.manager.devices():
+                if dev.alias() != None and dev.alias().startswith(ALIAS_PREFIX):
+                    logging.info(f"Possible device: {dev.mac_address} => {dev.alias()}")
+            self.__stop_service()
+
         self.device = Device(mac_address=self.config['device']['mac_addr'], manager=self.manager, on_resolved=self.__on_resolved, on_data=self.__on_data_received, on_connect_fail=self.__on_connect_fail, notify_uuid=NOTIFY_CHAR_UUID, write_uuid=WRITE_CHAR_UUID)
+
         try:
             self.device.connect()
             self.manager.run()

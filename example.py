@@ -20,4 +20,5 @@ def on_data_received(client, data):
 
 logging.info(f"Starting client: {config['device']['alias']} => {config['device']['mac_addr']}")
 
-BTOneClient(config, on_data_received).connect()
+client = BTOneClient(config, on_data_received)
+client.connect()
