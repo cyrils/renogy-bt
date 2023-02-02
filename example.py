@@ -1,7 +1,7 @@
 import logging
 import configparser
-from renogybtone import BTOneClient
-from renogybtone import DataLogger
+from renogybt import BTOneClient
+from renogybt import DataLogger
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -20,5 +20,4 @@ def on_data_received(client, data):
 
 logging.info(f"Starting client: {config['device']['alias']} => {config['device']['mac_addr']}")
 
-client = BTOneClient(config, on_data_received)
-client.connect()
+BTOneClient(config, on_data_received).connect()

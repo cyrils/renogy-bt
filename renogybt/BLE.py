@@ -1,7 +1,6 @@
 import gatt
 import logging 
 import time
-import os
 
 DISCOVERY_TIMEOUT = 5 # max wait time to complete the bluetooth scanning (seconds)
 
