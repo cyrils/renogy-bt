@@ -35,7 +35,6 @@ class DeviceManager(gatt.DeviceManager):
         self.stop_discovery()
 
     def device_discovered(self, device):
-        super.device_discovered(device)
         logging.info("[{}] Discovered, alias = {}".format(device.mac_address, device.alias()))
 
 

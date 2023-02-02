@@ -40,7 +40,7 @@ class BTOneClient:
             logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
             for dev in self.manager.devices():
                 if dev.alias() != None and dev.alias().startswith(ALIAS_PREFIX):
-                    logging.info(f"Possible device: {dev.mac_address} => {dev.alias()}")
+                    logging.debug(f"Possible device: {dev.mac_address} => {dev.alias()}")
             self.__stop_service()
 
         self.device = Device(mac_address=self.config['device']['mac_addr'], manager=self.manager, on_resolved=self.__on_resolved, on_data=self.__on_data_received, on_connect_fail=self.__on_connect_fail, notify_uuid=NOTIFY_CHAR_UUID, write_uuid=WRITE_CHAR_UUID)
