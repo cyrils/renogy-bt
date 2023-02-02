@@ -1,19 +1,25 @@
-import logging 
-from BTOneApp import BTOneApp 
+import logging
+import configparser
+from renogybt import BTOneClient
+from renogybt import DataLogger
 
 logging.basicConfig(level=logging.DEBUG)
 
-ADAPTER = "hci0"
-MAC_ADDR = "80:6F:B0:0F:XX:XX"
-DEVICE_ALIAS = "BT-TH-B00FXXXX"
-POLL_INTERVAL = 30 # read data interval (seconds)
+config = configparser.ConfigParser()
+config.read('config.ini')
+data_logger: DataLogger = DataLogger(config)
 
-def on_connected(app: BTOneApp):
-    app.poll_params() # OR app.set_load(1)
+def on_data_received(client: BTOneClient, data):
+    logging.debug("{} => {}".format(client.device.alias(), data))
+    if client.config['remote_logging'].getboolean('enabled'):
+        data_logger.log_remote(json_data=data)
+    if client.config['mqtt'].getboolean('enabled'):
+        data_logger.log_mqtt(json_data=data)
+    if client.config['pvoutput'].getboolean('enabled'):
+        data_logger.log_pvoutput(json_data=data)
+    if not client.config['device'].getboolean('enable_polling'):
+        client.disconnect()
 
-def on_data_received(app: BTOneApp, data):
-    logging.debug("{} => {}".format(app.device.alias(), data))
-    # app.disconnect() # disconnect here if you do not want polling
+logging.info(f"Starting client: {config['device']['alias']} => {config['device']['mac_addr']}")
 
-bt1 = BTOneApp(ADAPTER, MAC_ADDR, DEVICE_ALIAS, on_connected, on_data_received, POLL_INTERVAL)
-bt1.connect()
+BTOneClient(config, on_data_received).connect()

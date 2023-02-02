@@ -4,3 +4,4 @@ solar-reader.py
 .vscode/sftp.json
 RelayApp.py
 relay.py
+.DS_Store
