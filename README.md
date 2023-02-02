@@ -1,15 +1,6 @@
 # Renogy BT-1
-Python library to read Renogy RS232 compatible [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth adapter. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr, WEIZE etc. It supports periodic data polling and can also log the data to MQTT and to your own custom server.
+Python library to read Renogy RS232 compatible [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth adapter. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr, WEIZE etc. It supports periodic data polling and can also log the data to local [MQTT](https://mqtt.org/) broker, [PVOutput](https://pvoutput.org/) cloud or your own custom server.
 
-## Installation
-
-```
-pip3 install renogybt
-``` 
-To obtain the full code, including examples and documentation, you can clone the git repository:
-```
-git clone https://github.com/cyrils/renogy-bt1.git
-```
 ## Example
 Make sure to update `config.ini` with correct values for `mac_addr` and `alias` and run the following command:
 
@@ -25,7 +16,7 @@ BTOneClient(config, on_data_received).connect()
 
 **How to get mac address?**
 
-The library will automatically list possible bt1 devices discovered nearby with alias starting `BT-TH`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
+The library will automatically list possible bt-1 devices discovered nearby with alias starting `BT-TH`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
 
 **Output**
 

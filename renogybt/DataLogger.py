@@ -1,9 +1,9 @@
 import json
 import logging
 import requests
+import paho.mqtt.publish as publish
 from configparser import ConfigParser
 from datetime import datetime
-import paho.mqtt.publish as publish
 
 PVOUTPUT_URL = 'http://pvoutput.org/service/r2/addstatus.jsp'
 
@@ -14,7 +14,7 @@ class DataLogger:
     def log_remote(self, json_data):
         headers = { "Authorization" : f"Bearer {self.config['remote_logging']['auth_header']}" }
         req = requests.post(self.config['remote_logging']['url'], json = json_data, timeout=15, headers=headers)
-        print("Log remote 200" if req.status_code == 200 else f"Log remote error {req.status_code}")
+        logging.info("Log remote 200") if req.status_code == 200 else logging.error(f"Log remote error {req.status_code}")
 
     def log_mqtt(self, json_data):
         logging.info(f"mqtt logging")
