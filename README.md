@@ -36,7 +36,7 @@ DEBUG:root:create_read_request 256 => [255, 3, 1, 0, 0, 34, 209, 241]
 INFO:root:characteristic_write_value_succeeded
 INFO:root:characteristic_enable_notifications_succeeded
 INFO:root:on_data_received: response for read operation
-DEBUG:root:BT-TH-B00FXXXX => {'function': 'READ', 'battery_percentage': 100, 'battery_voltage': 14.4, 'controller_temperature': 34, 'battery_temperature': 25, 'load_status': 'off', 'load_voltage': 0.0, 'load_current': 0.0, 'load_power': 0, 'pv_voltage': 17.1, 'pv_current': 5.26, 'pv_power': 101, 'max_charging_power_today': 276, 'max_discharging_power_today': 4, 'charging_amp_hours_today': 59, 'discharging_amp_hours_today': 2, 'power_generation_today': 797, 'power_generation_total': 291253, 'charging_status': 'mppt'}
+DEBUG:root:BT-TH-B00FXXXX => {'function': 'READ', 'battery_percentage': 87, 'battery_voltage': 12.9, 'battery_current': 2.58, 'battery_temperature': 25, 'controller_temperature': 33, 'load_status': 'off', 'load_voltage': 0.0,'load_current': 0.0, 'load_power': 0, 'pv_voltage': 17.1, 'pv_current': 2.04, 'pv_power': 35, 'max_charging_power_today': 143, 'max_discharging_power_today': 0, 'charging_amp_hours_today': 34, 'discharging_amp_hours_today': 34, 'power_generation_today': 432, 'power_consumption_today': 0, 'power_generation_total': 426038, 'charging_status': 'mppt'}
 INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 ```
 

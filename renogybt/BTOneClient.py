@@ -76,7 +76,7 @@ class BTOneClient:
 
     def __on_resolved(self):
         logging.info("resolved services")
-        self.poll_params() if self.config['device'].getboolean('poll_data') == True else self.__read_params()
+        self.poll_params() if self.config['device'].getboolean('enable_polling') == True else self.__read_params()
 
     def __on_data_received(self, value):
         operation = bytes_to_int(value, 1, 1)
