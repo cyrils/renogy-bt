@@ -8,7 +8,7 @@ Make sure to update `config.ini` with correct values for `mac_addr` and `alias` 
 python3 ./example.py
 ```
 
-Or use it as a module with your own custom config and callback function:
+Alternatively, use it as a module with your own custom config and callback function:
 ```python
 from renogybt import BTOneClient
 BTOneClient(config, on_data_received).connect()
@@ -40,6 +40,19 @@ DEBUG:root:BT-TH-B00FXXXX => {'function': 'READ', 'battery_percentage': 87, 'bat
 INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 ```
 
+## Data logging
+
+Supports logging data to local MQTT brokers like [Mosquitto](https://mosquitto.org/) or third party services like [PVOutput](https://pvoutput.org/) or even your own server. See `config.ini` for more details. Please note that free PVOutput accounts have a cap of 1 request per minute. If you enable remote logging to your own API, the json data is posted in the POST body of the HTTP call. The optional `auth_header` is sent as http header `Authorization: Bearer <auth-header>`.
+
+Example php code at the server:
+```php
+$headers = getallheaders();
+if ($headers['Authorization'] != "Bearer 123456789") {
+    header( 'HTTP/1.0 403 Forbidden', true, 403 );
+    die('403 Forbidden');
+}
+$json_data = json_decode(file_get_contents('php://input'), true);
+```
 
 ## Dependencies
 
