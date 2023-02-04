@@ -42,7 +42,27 @@ INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 
 ## Data logging
 
-Supports logging data to local MQTT brokers like [Mosquitto](https://mosquitto.org/) or third party services like [PVOutput](https://pvoutput.org/) or even your own server. See `config.ini` for more details. Please note that free PVOutput accounts have a cap of 1 request per minute. If you enable remote logging to your own API, the json data is posted in the POST body of the HTTP call. The optional `auth_header` is sent as http header `Authorization: Bearer <auth-header>`.
+Supports logging data to local MQTT brokers like [Mosquitto](https://mosquitto.org/) or [Home Assistant](https://www.home-assistant.io/). You can also log it to third party cloud services like [PVOutput](https://pvoutput.org/). See `config.ini` for more details. Note that free PVOutput accounts have a cap of one request per minute.
+
+Example config to add to your home assistant `configuration.yaml`:
+```yaml
+mqtt:
+  sensor:
+    - name: "Solar Power"
+      state_topic: "solar/stats"
+      unit_of_measurement: "W"
+      value_template: "{{ value_json.pv_power }}"
+    - name: "Battery SOC"
+      state_topic: "solar/stats"
+      unit_of_measurement: "%"
+      value_template: "{{ value_json.battery_percentage }}"
+
+# check output log for more fields
+```
+
+**Custom logging**
+
+You can even upload it to your own server. If you write your custom API, the json data is posted as body of the HTTP call. The optional `auth_header` is sent as http header `Authorization: Bearer <auth-header>`
 
 Example php code at the server:
 ```php
