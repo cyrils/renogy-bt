@@ -51,7 +51,7 @@ class BTOneClient:
         except Exception as e:
             self.__on_error(True, e)
         except KeyboardInterrupt:
-            self.__on_error()
+            self.__on_error(False, "KeyboardInterrupt")
 
     def disconnect(self):
         self.device.disconnect()

@@ -56,13 +56,12 @@ mqtt:
       state_topic: "solar/stats"
       unit_of_measurement: "%"
       value_template: "{{ value_json.battery_percentage }}"
-
 # check output log for more fields
 ```
 
 **Custom logging**
 
-You can even upload it to your own server. If you write your custom API, the json data is posted as body of the HTTP call. The optional `auth_header` is sent as http header `Authorization: Bearer <auth-header>`
+Should you choose to upload to your own server, the json data is posted as body of the HTTP call. The optional `auth_header` is sent as http header `Authorization: Bearer <auth-header>`
 
 Example php code at the server:
 ```php
