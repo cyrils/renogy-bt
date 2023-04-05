@@ -92,7 +92,7 @@ class BTOneClient:
             if self.on_data_callback is not None:
                 self.on_data_callback(self, self.data)
         else:
-            logging.warn("on_data_received: unknown operation={}.format(operation)")
+            logging.warn("on_data_received: unknown operation={}".format(operation))
 
     def __on_error(self, connectFailed = False, error = None):
         logging.error(f"Exception occured: {error}")
