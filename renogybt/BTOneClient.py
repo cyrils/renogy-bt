@@ -79,6 +79,7 @@ class BTOneClient:
         self.poll_params() if self.config['device'].getboolean('enable_polling') == True else self.__read_params()
 
     def __on_data_received(self, value):
+        logging.info("on_data_received: {}".format(value))
         operation = bytes_to_int(value, 1, 1)
 
         if operation == 3:
