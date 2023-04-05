@@ -11,6 +11,10 @@ data_logger: DataLogger = DataLogger(config)
 
 def on_data_received(client: BTOneClient, data):
     logging.debug("{} => {}".format(client.device.alias(), data))
+
+    if data["charging_status"] != "mqtt":
+        return
+
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=data)
     if config['mqtt'].getboolean('enabled'):
