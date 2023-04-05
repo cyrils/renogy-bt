@@ -3,7 +3,7 @@ import configparser
 from renogybt import BTOneClient
 from renogybt import DataLogger
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(filename="renogy-bt2.log", filemode="a", level=logging.DEBUG)
 
 config = configparser.ConfigParser()
 config.read('config.ini')
