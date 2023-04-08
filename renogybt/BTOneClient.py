@@ -3,7 +3,7 @@ from threading import Timer
 import logging
 import configparser
 from .BLE import DeviceManager, Device
-from .Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, bytes_to_int
+from .Utils import create_request_payload, parse_charge_controller_info, parse_set_load_response, bytes_to_int, check_crc
 
 DEVICE_ID = 255
 POLL_INTERVAL = 30 # seconds
@@ -31,6 +31,7 @@ class BTOneClient:
         self.device = None
         self.timer = None
         self.data = {}
+        self.received_bytes = bytearray()
 
     def connect(self):
         self.manager = DeviceManager(adapter_name=self.config['device']['adapter'], mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'])
@@ -71,6 +72,7 @@ class BTOneClient:
 
     def __read_params(self):
         logging.info("reading params")
+        self.received_bytes = bytearray()
         request = create_request_payload(DEVICE_ID, READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
         self.device.characteristic_write_value(request)
 
@@ -80,15 +82,35 @@ class BTOneClient:
 
     def __on_data_received(self, value):
         logging.info("on_data_received: {}".format(value))
-        operation = bytes_to_int(value, 1, 1)
+
+        if value[0] != 0xff and len(self.received_bytes) == 0:
+            return
+
+        self.received_bytes += value
+
+        if len(self.received_bytes) < 5:
+            return
+
+        expected_length = bytes_to_int(self.received_bytes, 2, 1) + 5
+
+        if expected_length == 0 or expected_length != len(self.received_bytes):
+            return
+
+        packet_data = self.received_bytes[:expected_length]
+        self.received_bytes = self.received_bytes[expected_length+1:]
+
+        if not check_crc(packet_data):
+            return
+
+        operation = bytes_to_int(packet_data, 1, 1)
 
         if operation == 3:
             logging.info("on_data_received: response for read operation")
-            self.data = parse_charge_controller_info(value)
+            self.data = parse_charge_controller_info(packet_data)
             if self.on_data_callback is not None:
                 self.on_data_callback(self, self.data)
         elif operation == 6:
-            self.data = parse_set_load_response(value)
+            self.data = parse_set_load_response(packet_data)
             logging.info("on_data_received: response for write operation")
             if self.on_data_callback is not None:
                 self.on_data_callback(self, self.data)
