@@ -3,7 +3,7 @@ import configparser
 from renogybt import BTOneClient
 from renogybt import DataLogger
 
-logging.basicConfig(filename="renogy-bt2.log", filemode="a", level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -11,9 +11,6 @@ data_logger: DataLogger = DataLogger(config)
 
 def on_data_received(client: BTOneClient, data):
     logging.debug("{} => {}".format(client.device.alias(), data))
-
-    if data["charging_status"] != "mqtt":
-        return
 
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=data)
