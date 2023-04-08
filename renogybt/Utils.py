@@ -103,3 +103,11 @@ def parse_set_load_response(bs):
 def parse_temperature(raw_value):
     sign = raw_value >> 7
     return -(raw_value - 128) if sign == 1 else raw_value
+
+def check_crc(bs):
+    if len(bs) < 3:
+        return false
+
+    crc = libscrc.modbus(bs[:len(bs)-2])
+
+    return crc == bytes_to_int(bs, len(bs)-1, -2)
