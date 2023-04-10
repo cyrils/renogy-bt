@@ -93,7 +93,7 @@ class BTOneClient:
 
         expected_length = bytes_to_int(self.received_bytes, 2, 1) + 5
 
-        if expected_length == 0 or expected_length != len(self.received_bytes):
+        if expected_length == 0 or expected_length < len(self.received_bytes):
             return
 
         response_data = self.received_bytes[:expected_length]
