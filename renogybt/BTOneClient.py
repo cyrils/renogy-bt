@@ -96,21 +96,21 @@ class BTOneClient:
         if expected_length == 0 or expected_length != len(self.received_bytes):
             return
 
-        packet_data = self.received_bytes[:expected_length]
+        response_data = self.received_bytes[:expected_length]
         self.received_bytes = self.received_bytes[expected_length+1:]
 
-        if not check_crc(packet_data):
+        if not check_crc(response_data):
             return
 
-        operation = bytes_to_int(packet_data, 1, 1)
+        operation = bytes_to_int(response_data, 1, 1)
 
         if operation == 3:
             logging.info("on_data_received: response for read operation")
-            self.data = parse_charge_controller_info(packet_data)
+            self.data = parse_charge_controller_info(response_data)
             if self.on_data_callback is not None:
                 self.on_data_callback(self, self.data)
         elif operation == 6:
-            self.data = parse_set_load_response(packet_data)
+            self.data = parse_set_load_response(response_data)
             logging.info("on_data_received: response for write operation")
             if self.on_data_callback is not None:
                 self.on_data_callback(self, self.data)
