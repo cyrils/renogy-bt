@@ -1,5 +1,7 @@
 # Renogy BT-1
-Python library to read Renogy RS232 compatible [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth adapter. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr, WEIZE etc. It supports periodic data polling and can also log the data to local [MQTT](https://mqtt.org/) broker, [PVOutput](https://pvoutput.org/) cloud or your own custom server.
+Python library to read Renogy RS232 compatible solar charge controllers using [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth adapter. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. It supports periodic data polling and can also log the data to local [MQTT](https://mqtt.org/) broker, [PVOutput](https://pvoutput.org/) cloud or your own custom server.
+
+This was also tested and found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) adapter, but does not work with communication hub. Also it reads only charge controller data, and will fail with any other bluetooth connected peripherals like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)).
 
 ## Example
 Make sure to update `config.ini` with correct values for `mac_addr` and `alias` and run the following command:
@@ -42,7 +44,7 @@ INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 
 ## Data logging
 
-Supports logging data to local MQTT brokers like [Mosquitto](https://mosquitto.org/) or [Home Assistant](https://www.home-assistant.io/). You can also log it to third party cloud services like [PVOutput](https://pvoutput.org/). See `config.ini` for more details. Note that free PVOutput accounts have a cap of one request per minute.
+Supports logging data to local MQTT brokers like [Mosquitto](https://mosquitto.org/) or [Home Assistant](https://www.home-assistant.io/) dashboards. You can also log it to third party cloud services like [PVOutput](https://pvoutput.org/). See [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) for more details. Note that free PVOutput accounts have a cap of one request per minute.
 
 Example config to add to your home assistant `configuration.yaml`:
 ```yaml
@@ -61,7 +63,7 @@ mqtt:
 
 **Custom logging**
 
-Should you choose to upload to your own server, the json data is posted as body of the HTTP call. The optional `auth_header` is sent as http header `Authorization: Bearer <auth-header>`
+Should you choose to upload to your own server, the json data is posted as body of the HTTP POST call. The optional `auth_header` is sent as http header `Authorization: Bearer <auth-header>`
 
 Example php code at the server:
 ```php
