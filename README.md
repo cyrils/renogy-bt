@@ -1,10 +1,16 @@
 # Renogy BT-1
 Python library to read Renogy RS232 compatible solar charge controllers using [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth adapter. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. It supports periodic data polling and can also log the data to local [MQTT](https://mqtt.org/) broker, [PVOutput](https://pvoutput.org/) cloud or your own custom server.
 
-This was also tested and found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) adapter, but does not work with communication hub. Also it reads only charge controller data, and will fail with any other bluetooth connected peripherals like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)).
+This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) adapter, but does not work with communication hub. Also it reads only charge controller data, and will fail with any other bluetooth connected peripherals like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)).
+
+## Dependencies
+
+```sh
+python3 -m pip install -r requirements.txt
+```
 
 ## Example
-Make sure to update `config.ini` with correct values for `mac_addr` and `alias` and run the following command:
+Make sure to update [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) with correct values for `mac_addr` and `alias` and run the following command:
 
 ```sh
 python3 ./example.py
@@ -74,12 +80,13 @@ if ($headers['Authorization'] != "Bearer 123456789") {
 }
 $json_data = json_decode(file_get_contents('php://input'), true);
 ```
-
-## Dependencies
-
-```
-python3 -m pip install -r requirements.txt
-```
+## Compatibility
+| Device | Adapter | Tested |
+| -------- | :--------: | :--------: |
+| Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
+| Renogy Rover Elite | BT-2 |  ✅ |
+| RICH SOLAR 20/40/60 | BT-1 | ❓ |
+| SRNE ML24/ML48 Series | BT-1 | ❓ |
 
 ## References
 
