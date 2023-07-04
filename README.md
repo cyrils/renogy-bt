@@ -3,12 +3,6 @@ Python library to read Renogy RS232 compatible solar charge controllers using [B
 
 This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) adapter, but does not work with communication hub. Also it reads only charge controller data, and will fail with any other bluetooth connected peripherals like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)).
 
-## Dependencies
-
-```sh
-python3 -m pip install -r requirements.txt
-```
-
 ## Example
 Make sure to update [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) with correct values for `mac_addr` and `alias` and run the following command:
 
@@ -46,6 +40,12 @@ INFO:root:characteristic_enable_notifications_succeeded
 INFO:root:on_data_received: response for read operation
 DEBUG:root:BT-TH-B00FXXXX => {'function': 'READ', 'battery_percentage': 87, 'battery_voltage': 12.9, 'battery_current': 2.58, 'battery_temperature': 25, 'controller_temperature': 33, 'load_status': 'off', 'load_voltage': 0.0,'load_current': 0.0, 'load_power': 0, 'pv_voltage': 17.1, 'pv_current': 2.04, 'pv_power': 35, 'max_charging_power_today': 143, 'max_discharging_power_today': 0, 'charging_amp_hours_today': 34, 'discharging_amp_hours_today': 34, 'power_generation_today': 432, 'power_consumption_today': 0, 'power_generation_total': 426038, 'charging_status': 'mppt'}
 INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
+```
+
+## Dependencies
+
+```sh
+python3 -m pip install -r requirements.txt
 ```
 
 ## Data logging
