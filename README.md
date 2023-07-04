@@ -80,6 +80,7 @@ if ($headers['Authorization'] != "Bearer 123456789") {
 }
 $json_data = json_decode(file_get_contents('php://input'), true);
 ```
+
 ## Compatibility
 | Device | Adapter | Tested |
 | -------- | :--------: | :--------: |
