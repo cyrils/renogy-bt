@@ -16,7 +16,7 @@ class DeviceManager(gatt.DeviceManager):
         logging.info("Adapter status - Powered: {}".format(self.is_adapter_powered))
 
     def discover(self):
-        discovering = True; wait = DISCOVERY_TIMEOUT; self.device_found = False;
+        discovering = True; wait = DISCOVERY_TIMEOUT; self.device_found = False; mac_address = self.mac_address.upper();
 
         self.update_devices()
         logging.info("Starting discovery...")
@@ -26,16 +26,13 @@ class DeviceManager(gatt.DeviceManager):
             time.sleep(1)
             logging.info("Devices found: %s", len(self.devices()))
             for dev in self.devices():
-                if (dev.mac_address == self.mac_address or dev.alias() == self.device_alias) and discovering:
+                if dev.mac_address != None and (dev.mac_address.upper() == mac_address or dev.alias() == self.device_alias) and discovering:
                     logging.info("Found matching device %s => [%s]", dev.alias(), dev.mac_address)
                     discovering = False; self.device_found = True
             wait = wait -1
             if (wait <= 0):
                 discovering = False
         self.stop_discovery()
-
-    def device_discovered(self, device):
-        logging.info("[{}] Discovered, alias = {}".format(device.mac_address, device.alias()))
 
 
 class Device(gatt.Device):
@@ -44,10 +41,8 @@ class Device(gatt.Device):
         self.data_callback = on_data
         self.resolved_callback = on_resolved
         self.connect_fail_callback = on_connect_fail
-        self.manager = manager
         self.notify_char_uuid = notify_uuid
         self.write_char_uuid = write_uuid
-        self.mac_address = mac_address
 
     def connect_succeeded(self):
         super().connect_succeeded()

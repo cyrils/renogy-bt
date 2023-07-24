@@ -87,8 +87,8 @@ class BTOneClient:
             if self.on_data_callback is not None:
                 self.on_data_callback(self, self.data)
         elif operation == 6:
-            self.data = parse_set_load_response(value)
             logging.info("on_data_received: response for write operation")
+            self.data = parse_set_load_response(value)
             if self.on_data_callback is not None:
                 self.on_data_callback(self, self.data)
         else:

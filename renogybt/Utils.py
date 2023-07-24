@@ -28,16 +28,13 @@ def bytes_to_int(bs, offset, length):
         if len(bs) < (offset + length):
             return ret
         if length > 0:
-            # offset = 11, length = 2 => 11 - 12
             byteorder='big'
             start = offset
             end = offset + length
         else:
-            # offset = 11, length = -2 => 10 - 11
             byteorder='little'
             start = offset + length + 1
             end = offset + 1
-        # Easier to read than the bitshifting below
         return int.from_bytes(bs[start:end], byteorder=byteorder)
 
 
