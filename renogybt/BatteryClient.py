@@ -12,7 +12,7 @@ WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
 READ_PARAMS = {
     'FUNCTION': 3,
     'REGISTER': 5000,
-    'WORDS': 5
+    'WORDS': 11
 }
 
 class BatteryClient:
