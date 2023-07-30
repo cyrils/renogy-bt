@@ -100,3 +100,29 @@ def parse_set_load_response(bs):
 def parse_temperature(raw_value):
     sign = raw_value >> 7
     return -(raw_value - 128) if sign == 1 else raw_value
+
+def create_cell_voltage_payload(device_id, function, regAddr, readWrd):                             
+    data = None                                
+
+    if regAddr:
+        data = []
+        data.append(device_id)
+        data.append(function)
+        data.append(int_to_bytes(regAddr, 0))
+        data.append(int_to_bytes(regAddr, 1))
+        data.append(int_to_bytes(readWrd, 0))
+        data.append(int_to_bytes(readWrd, 1))
+
+        crc = libscrc.modbus(bytes(data))
+        data.append(int_to_bytes(crc, 1))
+        data.append(int_to_bytes(crc, 0))
+        logging.debug("{} {} => {}".format("create_cell_voltage_payload", regAddr, data))
+    return data
+
+def parse_cell_voltage(bs):
+    data = {'function': 'READ_VOLTS'}
+    data['cell_count'] = bytes_to_int(bs, 0, 1)
+    for i in range(1, data['cell_count']):
+        data[f'cellvoltage_{i}'] = bytes_to_int(bs, i*2, 1)
+
+    return data
