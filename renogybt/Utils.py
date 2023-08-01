@@ -123,16 +123,20 @@ def parse_battery_info(bs):
     data = {}
     data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
     data['cell_count'] = bytes_to_int(bs, 3, 2)
+    data['sensor_count'] = bytes_to_int(bs, 37, 2)
 
     for i in range(0, data['cell_count']):
-        data[f'cell_voltage_{i}'] = bytes_to_int(bs, 5 + i * 2, 2) * 0.1
+        data[f'cell_voltage_{i}'] = bytes_to_int(bs, 5 + i*2, 2) * 0.1
 
-    for i in range(0, data['cell_count']):
-        data[f'cell_temperature_{i}'] = bytes_to_int(bs, 21 + i * 2 , 2) * 0.1
+    for i in range(0, data['sensor_count']):
+        data[f'cell_temperature_{i}'] = bytes_to_int(bs, 39 + i*2 , 2) * 0.1
 
-    data['current'] = bytes_to_int(bs, 85, 2) * 0.01
-    data['voltage'] = bytes_to_int(bs, 87, 2) * 0.1
-    data['remaining_charge'] = bytes_to_int(bs, 89, 4) * 0.001
-    data['capacity'] = bytes_to_int(bs, 93, 4) * 0.001
+    # for i in range(0, data['cell_count']):
+    #     data[f'cell_temperature_{i}'] = bytes_to_int(bs, 21 + i*2 , 2) * 0.1
+    
+    data['current'] = bytes_to_int(bs, 87, 2) * 0.01
+    data['voltage'] = bytes_to_int(bs, 89, 2) * 0.1
+    data['remaining_charge'] = bytes_to_int(bs, 91, 4) * 0.001
+    data['capacity'] = bytes_to_int(bs, 95, 4) * 0.001
 
     return data
