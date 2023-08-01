@@ -55,7 +55,7 @@ class BatteryClient:
         self.read_params()
 
     def __on_data_received(self, value):
-        logging.info("on_data_received: response for read operation", value.hex())
+        logging.info("on_data_received: response for read operation")
         self.data = parse_battery_info(value)
         if self.on_data_callback is not None:
             self.on_data_callback(self, self.data)
