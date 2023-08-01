@@ -101,7 +101,7 @@ def parse_temperature(raw_value):
     sign = raw_value >> 7
     return -(raw_value - 128) if sign == 1 else raw_value
 
-def create_cell_voltage_payload(device_id, function, regAddr, readWrd):                             
+def create_battery_read_payload(device_id, function, regAddr, readWrd):                             
     data = None                                
 
     if regAddr:
@@ -119,10 +119,20 @@ def create_cell_voltage_payload(device_id, function, regAddr, readWrd):
         logging.debug("{} {} => {}".format("create_cell_voltage_payload", regAddr, data))
     return data
 
-def parse_cell_voltage(bs):
-    data = {'function': 'READ_VOLTS'}
-    data['cell_count'] = bytes_to_int(bs, 0, 1)
-    for i in range(1, data['cell_count']):
-        data[f'cellvoltage_{i}'] = bytes_to_int(bs, i*2, 1)
+def parse_battery_info(bs):
+    data = {}
+    data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
+    data['cell_count'] = bytes_to_int(bs, 3, 2)
+
+    for i in range(0, data['cell_count']):
+        data[f'cell_voltage_{i}'] = bytes_to_int(bs, 5 + i * 2, 2) * 0.1
+
+    for i in range(0, data['cell_count']):
+        data[f'cell_temperature_{i}'] = bytes_to_int(bs, 21 + i * 2 , 2) * 0.1
+
+    data['current'] = bytes_to_int(bs, 85, 2) * 0.01
+    data['voltage'] = bytes_to_int(bs, 87, 2) * 0.1
+    data['remaining_charge'] = bytes_to_int(bs, 89, 4) * 0.001
+    data['capacity'] = bytes_to_int(bs, 93, 4) * 0.001
 
     return data

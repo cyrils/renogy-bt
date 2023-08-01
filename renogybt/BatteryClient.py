@@ -2,7 +2,7 @@ import os
 import logging
 import configparser
 from .BLE import DeviceManager, Device
-from .Utils import create_cell_voltage_payload, parse_cell_voltage
+from .Utils import create_battery_read_payload, parse_battery_info
 
 DEVICE_ID = 48 # or 247 ?
 
@@ -12,7 +12,7 @@ WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
 READ_PARAMS = {
     'FUNCTION': 3,
     'REGISTER': 5000,
-    'WORDS': 11
+    'WORDS': 46
 }
 
 class BatteryClient:
@@ -47,7 +47,7 @@ class BatteryClient:
 
     def read_params(self):
         logging.info("reading params")
-        request = create_cell_voltage_payload(DEVICE_ID, READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
+        request = create_battery_read_payload(DEVICE_ID, READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
         self.device.characteristic_write_value(request)
 
     def __on_resolved(self):
@@ -55,8 +55,8 @@ class BatteryClient:
         self.read_params()
 
     def __on_data_received(self, value):
-        logging.info("on_data_received: response for read operation", value)
-        self.data = parse_cell_voltage(value)
+        logging.info("on_data_received: response for read operation", value.hex())
+        self.data = parse_battery_info(value)
         if self.on_data_callback is not None:
             self.on_data_callback(self, self.data)
 
