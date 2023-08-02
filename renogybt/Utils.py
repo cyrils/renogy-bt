@@ -101,24 +101,6 @@ def parse_temperature(raw_value):
     sign = raw_value >> 7
     return -(raw_value - 128) if sign == 1 else raw_value
 
-def create_battery_read_payload(device_id, function, regAddr, readWrd):                             
-    data = None                                
-
-    if regAddr:
-        data = []
-        data.append(device_id)
-        data.append(function)
-        data.append(int_to_bytes(regAddr, 0))
-        data.append(int_to_bytes(regAddr, 1))
-        data.append(int_to_bytes(readWrd, 0))
-        data.append(int_to_bytes(readWrd, 1))
-
-        crc = libscrc.modbus(bytes(data))
-        data.append(int_to_bytes(crc, 1))
-        data.append(int_to_bytes(crc, 0))
-        logging.debug("{} {} => {}".format("create_cell_voltage_payload", regAddr, data))
-    return data
-
 def parse_battery_info(bs):
     data = {}
     data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
@@ -129,11 +111,8 @@ def parse_battery_info(bs):
         data[f'cell_voltage_{i}'] = bytes_to_int(bs, 5 + i*2, 2) * 0.1
 
     for i in range(0, data['sensor_count']):
-        data[f'cell_temperature_{i}'] = bytes_to_int(bs, 39 + i*2 , 2) * 0.1
+        data[f'temperature_{i}'] = bytes_to_int(bs, 39 + i*2, 2) * 0.1
 
-    # for i in range(0, data['cell_count']):
-    #     data[f'cell_temperature_{i}'] = bytes_to_int(bs, 21 + i*2 , 2) * 0.1
-    
     data['current'] = bytes_to_int(bs, 87, 2) * 0.01
     data['voltage'] = bytes_to_int(bs, 89, 2) * 0.1
     data['remaining_charge'] = bytes_to_int(bs, 91, 4) * 0.001
