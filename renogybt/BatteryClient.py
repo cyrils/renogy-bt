@@ -45,7 +45,7 @@ class BatteryClient(BaseClient):
         for i in range(0, data['sensor_count']):
             data[f'temperature_{i}'] = bytes_to_int(bs, 39 + i*2, 2) * 0.1
 
-        data['current'] = bytes_to_int(bs, 87, 2) * 0.01
+        data['current'] = bytes_to_int(bs, 87, 2, True) * 0.01
         data['voltage'] = bytes_to_int(bs, 89, 2) * 0.1
         data['remaining_charge'] = bytes_to_int(bs, 91, 4) * 0.001
         data['capacity'] = bytes_to_int(bs, 95, 4) * 0.001
