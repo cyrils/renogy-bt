@@ -1,14 +1,15 @@
-import os
 import logging
-import configparser
-from .BLE import DeviceManager, Device
-from .Utils import create_request_payload, parse_battery_info
+from .BaseClient import BaseClient
+from .Utils import bytes_to_int
 
-# Renogy LFP battery RBT100LFP12-BT-XX series
+# Client for Renogy LFP battery RBT100LFP12-BT-XX series
 
 DEVICE_ID = 48
-NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
-WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
+
+FUNCTION = {
+    3: "READ",
+    6: "WRITE"
+}
 
 READ_PARAMS = {
     'FUNCTION': 3,
@@ -16,59 +17,37 @@ READ_PARAMS = {
     'WORDS': 48
 }
 
-class BatteryClient:
+class BatteryClient(BaseClient):
     def __init__(self, config, on_data_callback=None):
-        self.config: configparser.ConfigParser = config
+        super().__init__(config)
         self.on_data_callback = on_data_callback
-        self.manager = None
-        self.device = None
-        self.timer = None
-        self.data = {}
-
-    def connect(self):
-        self.manager = DeviceManager(adapter_name=self.config['device']['adapter'], mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'])
-        self.manager.discover()
-
-        if not self.manager.device_found:
-            logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
-
-        self.device = Device(mac_address=self.config['device']['mac_addr'], manager=self.manager, on_resolved=self.__on_resolved, on_data=self.__on_data_received, on_connect_fail=self.__on_connect_fail, notify_uuid=NOTIFY_CHAR_UUID, write_uuid=WRITE_CHAR_UUID)
-
-        try:
-            self.device.connect()
-            self.manager.run()
-        except Exception as e:
-            self.__on_error(True, e)
-        except KeyboardInterrupt:
-            self.__on_error(False, "KeyboardInterrupt")
-
-    def disconnect(self):
-        self.device.disconnect()
-        self.__stop_service()
 
     def read_params(self):
         logging.info("reading params")
-        request = create_request_payload(DEVICE_ID, READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
+        request = self.create_generic_read_request(DEVICE_ID, READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
         self.device.characteristic_write_value(request)
 
-    def __on_resolved(self):
-        logging.info("resolved services")
-        self.read_params()
-
-    def __on_data_received(self, value):
+    def on_data_received(self, value):
         logging.info("on_data_received: response for read operation")
-        self.data = parse_battery_info(value)
+        self.data = self.parse_battery_info(value)
         if self.on_data_callback is not None:
             self.on_data_callback(self, self.data)
 
-    def __on_error(self, connectFailed = False, error = None):
-        logging.error(f"Exception occured: {error}")
-        self.__stop_service() if connectFailed else self.disconnect()
+    def parse_battery_info(self, bs):
+        data = {}
+        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
+        data['cell_count'] = bytes_to_int(bs, 3, 2)
+        data['sensor_count'] = bytes_to_int(bs, 37, 2)
 
-    def __on_connect_fail(self, error):
-        logging.error(f"Connection failed: {error}")
-        self.__stop_service()
+        for i in range(0, data['cell_count']):
+            data[f'cell_voltage_{i}'] = bytes_to_int(bs, 5 + i*2, 2) * 0.1
 
-    def __stop_service(self):
-        self.manager.stop()
-        os._exit(os.EX_OK)
+        for i in range(0, data['sensor_count']):
+            data[f'temperature_{i}'] = bytes_to_int(bs, 39 + i*2, 2) * 0.1
+
+        data['current'] = bytes_to_int(bs, 87, 2) * 0.01
+        data['voltage'] = bytes_to_int(bs, 89, 2) * 0.1
+        data['remaining_charge'] = bytes_to_int(bs, 91, 4) * 0.001
+        data['capacity'] = bytes_to_int(bs, 95, 4) * 0.001
+
+        return data

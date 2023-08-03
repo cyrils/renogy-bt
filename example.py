@@ -1,7 +1,7 @@
 import logging
 import configparser
 import os
-from renogybt import BTOneClient
+from renogybt import BTModuleClient
 from renogybt import DataLogger
 
 logging.basicConfig(level=logging.DEBUG)
@@ -11,7 +11,7 @@ config = configparser.ConfigParser()
 config.read(config_file)
 data_logger: DataLogger = DataLogger(config)
 
-def on_data_received(client: BTOneClient, data):
+def on_data_received(client: BTModuleClient, data):
     logging.debug("{} => {}".format(client.device.alias(), data))
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=data)
@@ -24,4 +24,4 @@ def on_data_received(client: BTOneClient, data):
 
 logging.info(f"Starting client: {config['device']['alias']} => {config['device']['mac_addr']}")
 
-BTOneClient(config, on_data_received).connect()
+BTModuleClient(config, on_data_received).connect()
