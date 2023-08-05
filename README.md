@@ -1,21 +1,22 @@
-# Renogy BT-1
+# Renogy BT
 ![253431335-bd097475-af3e-40e0-9787-3332608635df](https://github.com/cyrils/renogy-bt1/assets/5549113/940c205e-738d-4a68-982f-1695c80bfed5)
 
 Python library to read Renogy RS232 compatible solar charge controllers using [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth module. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. It supports periodic data polling and can also log the data to local [MQTT](https://mqtt.org/) broker, [PVOutput](https://pvoutput.org/) cloud or your own custom server.
 
-This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but reads only charge controller data. It will fail if any other peripherals are connected to communication hub, like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)).
+This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but will fail if multiple devices are connected to communication hub, like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)). However standalone [Renogy Lithium Battery](https://www.renogy.com/12v-100ah-lithium-iron-phosphate-battery-w-bluetooth/) with built-in Bluetooth is supported.
 
 ## Example
-Make sure to update [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) with correct values for `mac_addr` and `alias` and run the following command:
+Create separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) for each device, update correct values for `mac_addr` and `alias` and run the following command:
 
 ```sh
-python3 ./example.py
+python3 ./example.py #charge controller
+python3 ./example_battery.py #battery (experimental)
 ```
 
 Alternatively, use it as a module with your own custom config and callback function:
 ```python
-from renogybt import BTOneClient
-BTOneClient(config, on_data_received).connect()
+from renogybt import BTModuleClient
+BTModuleClient(config, on_data_received).connect()
 ```
 
 **How to get mac address?**
@@ -88,6 +89,7 @@ $json_data = json_decode(file_get_contents('php://input'), true);
 | -------- | :--------: | :--------: |
 | Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
 | Renogy Rover Elite | BT-2 |  ✅ |
+| Renogy Battery RBT100LFP12-BT | - | ✅ |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
 
