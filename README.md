@@ -18,7 +18,6 @@ Alternatively, use it as a module with your own custom config and callback funct
 from renogybt import BTModuleClient
 BTModuleClient(config, on_data_received).connect()
 ```
-
 **How to get mac address?**
 
 The library will automatically list possible bt-1 devices discovered nearby with alias starting `BT-TH`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
@@ -83,6 +82,14 @@ if ($headers['Authorization'] != "Bearer 123456789") {
 }
 $json_data = json_decode(file_get_contents('php://input'), true);
 ```
+
+**How to get continues output?**
+
+ The best way to get continues data is to schedule a cronjob by running `crontab -e` and insert the following code:
+```sh
+*/5 * * * * /path/to/renogy-bt/example.py #runs every 5 mins
+```
+However if you want to monitor realtime data, turn on polling in `config.ini` (default interval is 60 secs) and may be run it as a [service](https://gist.github.com/emxsys/a507f3cad928e66f6410e7ac28e2990f) for reliability.
 
 ## Compatibility
 | Device | Adapter | Tested |
