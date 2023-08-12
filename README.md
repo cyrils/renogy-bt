@@ -3,7 +3,7 @@
 
 Python library to read Renogy RS232 compatible solar charge controllers using [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth module. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. It supports periodic data polling and can also log the data to local [MQTT](https://mqtt.org/) broker, [PVOutput](https://pvoutput.org/) cloud or your own custom server.
 
-This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but will fail if multiple devices are connected to communication hub, like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)). However standalone [Renogy Lithium Battery](https://www.renogy.com/12v-100ah-lithium-iron-phosphate-battery-w-bluetooth/) with built-in Bluetooth is supported.
+This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but will fail if multiple devices are connected to communication hub, like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)). However standalone [Renogy LiFePO4 Battery](https://www.renogy.com/12v-100ah-lithium-iron-phosphate-battery-w-bluetooth/) with built-in Bluetooth is supported.
 
 ## Example
 Create separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) for each device, update correct values for `mac_addr` and `alias` and run the following command:
@@ -42,6 +42,10 @@ INFO:root:characteristic_enable_notifications_succeeded
 INFO:root:on_data_received: response for read operation
 DEBUG:root:BT-TH-B00FXXXX => {'function': 'READ', 'battery_percentage': 87, 'battery_voltage': 12.9, 'battery_current': 2.58, 'battery_temperature': 25, 'controller_temperature': 33, 'load_status': 'off', 'load_voltage': 0.0,'load_current': 0.0, 'load_power': 0, 'pv_voltage': 17.1, 'pv_current': 2.04, 'pv_power': 35, 'max_charging_power_today': 143, 'max_discharging_power_today': 0, 'charging_amp_hours_today': 34, 'discharging_amp_hours_today': 34, 'power_generation_today': 432, 'power_consumption_today': 0, 'power_generation_total': 426038, 'charging_status': 'mppt'}
 INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
+```
+```
+# Battery output
+DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'cell_count': 4, 'sensor_count': 2, 'cell_voltage_0': 3.3, 'cell_voltage_1': 3.3, 'cell_voltage_2': 3.3, 'cell_voltage_3': 3.3, 'temperature_0': 21.0, 'temperature_1': 21.0, 'current': 1.4, 'voltage': 13.2, 'remaining_charge': 81.4, 'capacity': 100.0} 
 ```
 
 ## Dependencies
@@ -89,7 +93,7 @@ $json_data = json_decode(file_get_contents('php://input'), true);
 ```sh
 */5 * * * * /path/to/renogy-bt/example.py #runs every 5 mins
 ```
-However if you want to monitor realtime data, turn on polling in `config.ini` (default interval is 60 secs) and may be run it as a [service](https://gist.github.com/emxsys/a507f3cad928e66f6410e7ac28e2990f) for reliability.
+If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may register it as a [service](https://gist.github.com/emxsys/a507f3cad928e66f6410e7ac28e2990f) for added reliability.
 
 ## Compatibility
 | Device | Adapter | Tested |
