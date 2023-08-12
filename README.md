@@ -91,9 +91,9 @@ $json_data = json_decode(file_get_contents('php://input'), true);
 
  The best way to get continues data is to schedule a cronjob by running `crontab -e` and insert the following code:
 ```sh
-*/5 * * * * /path/to/renogy-bt/example.py #runs every 5 mins
+*/5 * * * * python3 /path/to/renogy-bt/example.py #runs every 5 mins
 ```
-If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may register it as a [service](https://gist.github.com/emxsys/a507f3cad928e66f6410e7ac28e2990f) for added reliability.
+If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may also register it as a [service](https://gist.github.com/emxsys/a507f3cad928e66f6410e7ac28e2990f) for added reliability.
 
 ## Compatibility
 | Device | Adapter | Tested |
