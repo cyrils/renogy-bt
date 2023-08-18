@@ -11,6 +11,7 @@ config = configparser.ConfigParser()
 config.read(config_file)
 data_logger: DataLogger = DataLogger(config)
 
+# the callback func when you receive data
 def on_data_received(client: BTModuleClient, data):
     logging.debug("{} => {}".format(client.device.alias(), data))
     if config['remote_logging'].getboolean('enabled'):
@@ -22,6 +23,5 @@ def on_data_received(client: BTModuleClient, data):
     if not config['device'].getboolean('enable_polling'):
         client.disconnect()
 
-logging.info(f"Starting client: {config['device']['alias']} => {config['device']['mac_addr']}")
-
+# start client
 BTModuleClient(config, on_data_received).connect()

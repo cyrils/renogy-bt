@@ -8,17 +8,6 @@ from .Utils import bytes_to_int, parse_temperature
 
 DEVICE_ID = 255
 
-READ_PARAMS = {
-    'FUNCTION': 3,
-    'REGISTER': 256,
-    'WORDS': 34
-}
-
-WRITE_PARAMS_LOAD = {
-    'FUNCTION': 6,
-    'REGISTER': 266
-}
-
 FUNCTION = {
     3: "READ",
     6: "WRITE"
@@ -39,46 +28,57 @@ LOAD_STATE = {
   1: 'on'
 }
 
+BATTERY_TYPE = {
+    1: 'open',
+    2: 'sealed',
+    3: 'gel',
+    4: 'lithium',
+    5: 'self-customized'
+}
+
 class BTModuleClient(BaseClient):
     def __init__(self, config, on_data_callback=None):
         super().__init__(config)
         self.on_data_callback = on_data_callback
+        self.data = {}
+        self.device_id = DEVICE_ID
+        self.sections = [
+            {'register': 12, 'words': 8, 'parser': self.parse_device_info},
+            {'register': 256, 'words': 34, 'parser': self.parse_chargin_info},
+            {'register': 57348, 'words': 1, 'parser': self.parse_battery_type}
+        ]
+        self.set_load_params = {'function': 6, 'register': 266}
 
-    def read_params(self):
-        logging.info("reading params")
-        request = self.create_generic_read_request(DEVICE_ID, READ_PARAMS["FUNCTION"], READ_PARAMS["REGISTER"], READ_PARAMS["WORDS"])
-        self.device.characteristic_write_value(request)
+    def on_read_operation_complete(self):
+        logging.info("on_read_operation_complete")
+        if self.on_data_callback is not None:
+            self.on_data_callback(self, self.data)
 
-    def on_data_received(self, value):
-        operation = bytes_to_int(value, 1, 1)
-
-        if operation == 3:
-            logging.info("on_data_received: response for read operation")
-            self.data = self.parse_charge_controller_info(value)
-            if self.on_data_callback is not None:
-                self.on_data_callback(self, self.data)
-        elif operation == 6:
-            logging.info("on_data_received: response for write operation")
-            self.data = self.parse_set_load_response(value)
-            if self.on_data_callback is not None:
-                self.on_data_callback(self, self.data)
-        else:
-            logging.warn("on_data_received: unknown operation={}".format(operation))
+    def on_write_operation_complete(self):
+        logging.info("on_write_operation_complete")
+        if self.on_data_callback is not None:
+            self.on_data_callback(self, self.data)
 
     def set_load(self, value = 0):
         logging.info("setting load {}".format(value))
-        request = self.create_generic_read_request(DEVICE_ID, WRITE_PARAMS_LOAD["FUNCTION"], WRITE_PARAMS_LOAD["REGISTER"], value)
+        request = self.create_generic_read_request(self.device_id, self.set_load_params["function"], self.set_load_params["register"], value)
         self.device.characteristic_write_value(request)
 
-    def parse_charge_controller_info(self, bs):
+    def parse_device_info(self, bs):
         data = {}
-        data['function'] = FUNCTION[bytes_to_int(bs, 1, 1)]
+        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
+        data['model'] = (bs[3:17]).decode('utf-8')
+        return data
+    
+    def parse_chargin_info(self, bs):
+        data = {}
+        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['battery_percentage'] = bytes_to_int(bs, 3, 2)
         data['battery_voltage'] = bytes_to_int(bs, 5, 2) * 0.1
         data['battery_current'] = bytes_to_int(bs, 7, 2) * 0.01
         data['battery_temperature'] = parse_temperature(bytes_to_int(bs, 10, 1))
         data['controller_temperature'] = parse_temperature(bytes_to_int(bs, 9, 1))
-        data['load_status'] = LOAD_STATE[bytes_to_int(bs, 67, 1) >> 7]
+        data['load_status'] = LOAD_STATE.get(bytes_to_int(bs, 67, 1) >> 7)
         data['load_voltage'] = bytes_to_int(bs, 11, 2) * 0.1
         data['load_current'] = bytes_to_int(bs, 13, 2) * 0.01
         data['load_power'] = bytes_to_int(bs, 15, 2)
@@ -92,11 +92,17 @@ class BTModuleClient(BaseClient):
         data['power_generation_today'] = bytes_to_int(bs, 41, 2)
         data['power_consumption_today'] = bytes_to_int(bs, 43, 2)
         data['power_generation_total'] = bytes_to_int(bs, 59, 4)
-        data['charging_status'] = CHARGING_STATE[bytes_to_int(bs, 68, 1)]
+        data['charging_status'] = CHARGING_STATE.get(bytes_to_int(bs, 68, 1))
+        return data
+    
+    def parse_battery_type(self, bs):
+        data = {}
+        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
+        data['battery_type'] = BATTERY_TYPE.get(bytes_to_int(bs, 3, 2))
         return data
 
     def parse_set_load_response(self, bs):
         data = {}
-        data['function'] = FUNCTION[bytes_to_int(bs, 1, 1)]
+        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['load_status'] = bytes_to_int(bs, 5, 1)
         return data
