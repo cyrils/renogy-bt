@@ -9,7 +9,7 @@ This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-b
 Create separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) for each device, update correct values for `mac_addr`, `alias` and `type` and run the following command:
 
 ```sh
-python3 ./example.py #charge controller
+python3 ./example.py # update with correct ini filename
 ```
 
 Alternatively, use it as a module with your own custom config and callback function:
