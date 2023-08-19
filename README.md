@@ -18,7 +18,7 @@ RoverClient(config, on_data_received).connect()
 ```
 **How to get mac address?**
 
-The library will automatically list possible bt-1 devices discovered nearby with alias starting `BT-TH`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
+The library will automatically list possible compatible devices discovered nearby with alias starting `BT-TH`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
 
 **Output**
 
