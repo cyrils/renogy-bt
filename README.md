@@ -6,13 +6,12 @@ Python library to read Renogy RS232 compatible solar charge controllers using [B
 This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but will fail if multiple devices are connected to communication hub, like renogy battery. However standalone Renogy LiFePO4 smart batteries are supported. See a complete list of [compatible devices](#compatibility).
 
 ## Example
-Create separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) for each device, update correct values for `mac_addr`, `alias` and `type` and run the following command:
+Each device needs a separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) file. Update  config file with correct values for `mac_addr`, `alias` and `type` and run the following command:
 
 ```sh
-python3 ./example.py # update with correct ini filename
+python3 ./example.py
 ```
-
-Alternatively, use it as a module with your own custom config and callback function:
+ Alternatively, use it as a module with your own custom config and callback function:
 ```python
 from renogybt import RoverClient
 RoverClient(config, on_data_received).connect()
