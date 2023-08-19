@@ -24,10 +24,11 @@ The library will automatically list possible bt-1 devices discovered nearby with
 **Output**
 
 ```
+INFO:root:Init RoverClient: BT-TH-B00FXXXX => 80:6F:B0:0F:XX:XX
 INFO:root:Adapter status - Powered: True
 INFO:root:Starting discovery...
 INFO:root:Devices found: 5
-INFO:root:Found bt1 device BT-TH-B00FXXXX  [XX:6F:B0:0F:XX:XX]
+INFO:root:Found bt1 device BT-TH-B00FXXXX  [80:6F:B0:0F:XX:XX]
 INFO:root:[80:6f:b0:0f:XX:XX] Discovered, alias = BT-TH-B00FXXXX
 INFO:root:[80:6F:B0:0F:XX:XX] Connected
 INFO:root:[80:6F:B0:0F:XX:XX] Resolved services
