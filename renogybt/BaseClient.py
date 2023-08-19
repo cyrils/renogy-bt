@@ -3,8 +3,11 @@ from threading import Timer
 import logging
 import configparser
 import libscrc
-from .Utils import int_to_bytes
+from .Utils import bytes_to_int, int_to_bytes
 from .BLE import DeviceManager, Device
+
+# Base class that works with all Renogy family devices
+# Should be extended by each client with its own parsers and section definitions
 
 ALIAS_PREFIX = 'BT-TH'
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
@@ -17,6 +20,9 @@ class BaseClient:
         self.device = None
         self.timer = None
         self.data = {}
+        self.device_id = None
+        self.sections = []
+        logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
 
     def connect(self):
         self.manager = DeviceManager(adapter_name=self.config['device']['adapter'], mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'])
@@ -45,22 +51,46 @@ class BaseClient:
 
     def __on_resolved(self):
         logging.info("resolved services")
-        self.poll_params() if self.config['device'].getboolean('enable_polling') == True else self.read_params()
+        self.poll_data() if self.config['device'].getboolean('enable_polling') == True else self.read_section()
 
-    def on_data_received(self, value):
-        logging.info("on_data_received")
+    def on_data_received(self, response):
+        operation = bytes_to_int(response, 1, 1)
+        if operation == 3: # read operation
+            logging.info("on_data_received: response for read operation")
+            index, section = self.find_section_by_response(response)
+            parsed_data = section['parser'](response) if section['parser'] != None else {}
+            self.data.update(parsed_data)
+            if index >= len(self.sections) - 1: # last section
+                self.on_read_operation_complete()
+                self.data = {}
+            else:
+                self.read_section(index + 1)
+        else:
+            logging.warn("on_data_received: unknown operation={}".format(operation))
+
+    def on_read_operation_complete(self):
+        logging.info("on_read_operation_complete")
         # to be implemented by subclass
 
-    def read_params(self):
-        logging.info("reading params")
-        # to be implemented by subclass
-
-    def poll_params(self):
-        self.read_params()
+    def poll_data(self):
+        self.read_section()
         if self.timer is not None and self.timer.is_alive():
             self.timer.cancel()
-        self.timer = Timer(self.config['device'].getint('poll_interval'), self.poll_params)
+        self.timer = Timer(self.config['device'].getint('poll_interval'), self.poll_data)
         self.timer.start()
+
+    def read_section(self, index = 0):
+        if self.device_id == None or len(self.sections) == 0:
+            return logging.error("base client cannot be used directly")
+        request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words']) 
+        self.device.characteristic_write_value(request)
+
+    def find_section_by_response(self, response):
+        length = len(response)
+        for index, param in enumerate(self.sections):
+            if param['words'] * 2 + 5 == length:
+                return index, param
+        return None
 
     def create_generic_read_request(self, device_id, function, regAddr, readWrd):                             
         data = None                                
