@@ -3,7 +3,7 @@
 
 Python library to read Renogy RS232 compatible solar charge controllers using [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth module. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. It supports periodic data polling and can also log the data to local [MQTT](https://mqtt.org/) broker, [PVOutput](https://pvoutput.org/) cloud or your own custom server.
 
-This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but will fail if multiple devices are connected to communication hub, like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)). However standalone Renogy LiFePO4 batteries are supported. See a complete list of [compatible devices](#compatibility).
+This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but will fail if multiple devices are connected to communication hub, like renogy battery. However standalone Renogy LiFePO4 batteries are supported. See a complete list of [compatible devices](#compatibility).
 
 ## Example
 Create separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) for each device, update correct values for `mac_addr`, `alias` and `type` and run the following command:
@@ -44,7 +44,7 @@ INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 ```
 ```
 # Battery output
-DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'cell_count': 4, 'cell_voltage_0': 3.6, 'cell_voltage_1': 3.6, 'cell_voltage_2': 3.6, 'cell_voltage_3': 3.6, 'sensor_count': 4, 'temperature_0': 21.0, 'temperature_1': 21.0, 'temperature_2': 21.0, 'temperature_3': 21.0, 'current': 1.4, 'voltage': 14.5, 'remaining_charge': 99.941, 'capacity': 100.0, 'model': 'RBT100LFP12S-G'} 
+DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'cell_count': 4, 'cell_voltage_0': 3.6, 'cell_voltage_1': 3.6, 'cell_voltage_2': 3.6, 'cell_voltage_3': 3.6, 'sensor_count': 4, 'temperature_0': 21.0, 'temperature_1': 21.0, 'temperature_2': 21.0, 'temperature_3': 21.0, 'current': 1.4, 'voltage': 14.5, 'remaining_charge': 99.941, 'capacity': 100.0} 
 ```
 
 ## Dependencies
