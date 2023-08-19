@@ -28,11 +28,6 @@ class BatteryClient(BaseClient):
         if self.on_data_callback is not None:
             self.on_data_callback(self, self.data)
 
-    def on_write_operation_complete(self):
-        logging.info("on_write_operation_complete")
-        if self.on_data_callback is not None:
-            self.on_data_callback(self, self.data)
-
     def parse_cell_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))

@@ -69,11 +69,7 @@ class BaseClient:
             logging.warn("on_data_received: unknown operation={}".format(operation))
 
     def on_read_operation_complete(self):
-        logging.info("on_read_operation_complete ")
-        # to be implemented by subclass
-
-    def on_write_operation_complete(self):
-        logging.info("on_read_operation_complete ")
+        logging.info("on_read_operation_complete")
         # to be implemented by subclass
 
     def poll_data(self):

@@ -3,7 +3,7 @@
 
 Python library to read Renogy RS232 compatible solar charge controllers using [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth module. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. It supports periodic data polling and can also log the data to local [MQTT](https://mqtt.org/) broker, [PVOutput](https://pvoutput.org/) cloud or your own custom server.
 
-This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but will fail if multiple devices are connected to communication hub, like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)). However standalone Renogy LiFePO4 batteries are supported. See a complete list of [supported devices](#compatibility).
+This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but will fail if multiple devices are connected to communication hub, like renogy battery (see [thread](https://github.com/cyrils/renogy-bt1/issues/7#issuecomment-1500237677)). However standalone Renogy LiFePO4 batteries are supported. See a complete list of [compatible devices](#compatibility).
 
 ## Example
 Create separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) for each device, update correct values for `mac_addr`, `alias` and `type` and run the following command:
@@ -99,8 +99,8 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | -------- | :--------: | :--------: |
 | Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
 | Renogy Rover Elite | BT-2 |  ✅ |
-| Renogy Battery RBT100LFP12S-XX | BT-2 | ✅ |
-| Renogy Battery RBT100LFP12-BT-XX | N/A | ✅ |
+| Renogy Battery RBT100LFP12S | BT-2 | ✅ |
+| Renogy Battery RBT100LFP12-BT (Built-in Bluetooth) | - | ✅ |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
 
