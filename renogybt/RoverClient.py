@@ -36,7 +36,7 @@ BATTERY_TYPE = {
     5: 'self-customized'
 }
 
-class BTModuleClient(BaseClient):
+class RoverClient(BaseClient):
     def __init__(self, config, on_data_callback=None):
         super().__init__(config)
         self.on_data_callback = on_data_callback
@@ -48,6 +48,14 @@ class BTModuleClient(BaseClient):
             {'register': 57348, 'words': 1, 'parser': self.parse_battery_type}
         ]
         self.set_load_params = {'function': 6, 'register': 266}
+
+    def on_data_received(self, response):
+        operation = bytes_to_int(response, 1, 1)
+        if operation == 6: # write operation
+            self.data = self.parse_set_load_response(response)
+            self.on_write_operation_complete(self, self.data)
+        else:
+            super().on_data_received(response)
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
@@ -94,7 +102,7 @@ class BTModuleClient(BaseClient):
         data['power_generation_total'] = bytes_to_int(bs, 59, 4)
         data['charging_status'] = CHARGING_STATE.get(bytes_to_int(bs, 68, 1))
         return data
-    
+
     def parse_battery_type(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))

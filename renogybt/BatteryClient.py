@@ -2,7 +2,7 @@ import logging
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int
 
-# Client for Renogy LFP battery RBT100LFP12-BT-XX series
+# Client for Renogy LFP battery with built-in bluetooth / BT-2 module
 
 DEVICE_ID = 48
 
@@ -44,7 +44,6 @@ class BatteryClient(BaseClient):
         data['sensor_count'] = bytes_to_int(bs, 37, 2)
         for i in range(0, data['sensor_count']):
             data[f'temperature_{i}'] = bytes_to_int(bs, 39 + i*2, 2) * 0.1
-
         return data
     
     def parse_battery_info(self, bs):
@@ -54,12 +53,10 @@ class BatteryClient(BaseClient):
         data['voltage'] = bytes_to_int(bs, 5, 2) * 0.1
         data['remaining_charge'] = bytes_to_int(bs, 7, 4) * 0.001
         data['capacity'] = bytes_to_int(bs, 11, 4) * 0.001
-
         return data
     
     def parse_device_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['model'] = (bs[3:17]).decode('utf-8')
-
         return data

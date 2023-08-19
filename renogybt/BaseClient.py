@@ -6,6 +6,9 @@ import libscrc
 from .Utils import bytes_to_int, int_to_bytes
 from .BLE import DeviceManager, Device
 
+# Base class that works with all Renogy family devices
+# Should be extended by each client with its own parsers and section definitions
+
 ALIAS_PREFIX = 'BT-TH'
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
@@ -19,7 +22,7 @@ class BaseClient:
         self.data = {}
         self.device_id = None
         self.sections = []
-        logging.info(f"Initing client: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
+        logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
 
     def connect(self):
         self.manager = DeviceManager(adapter_name=self.config['device']['adapter'], mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'])
@@ -53,7 +56,7 @@ class BaseClient:
     def on_data_received(self, response):
         operation = bytes_to_int(response, 1, 1)
         if operation == 3: # read operation
-            logging.info(f"on_data_received: response for read operation {response.hex()}")
+            logging.info("on_data_received: response for read operation")
             index, section = self.find_section_by_response(response)
             parsed_data = section['parser'](response) if section['parser'] != None else {}
             self.data.update(parsed_data)
@@ -62,10 +65,6 @@ class BaseClient:
                 self.data = {}
             else:
                 self.read_section(index + 1)
-        elif operation == 6: # write operation
-            logging.info("on_data_received: response for write operation")
-            self.data = self.parse_set_load_response(response)
-            self.on_write_operation_complete(self, self.data)
         else:
             logging.warn("on_data_received: unknown operation={}".format(operation))
 
