@@ -56,7 +56,7 @@ class BaseClient:
     def on_data_received(self, response):
         operation = bytes_to_int(response, 1, 1)
         if operation == 3: # read operation
-            logging.info(f"on_data_received: response for read operation{response.hex()}")
+            logging.info("on_data_received: response for read operation")
             index, section = self.find_section_by_response(response)
             parsed_data = section['parser'](response) if section['parser'] != None else {}
             self.data.update(parsed_data)
