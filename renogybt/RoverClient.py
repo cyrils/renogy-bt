@@ -55,6 +55,7 @@ class RoverClient(BaseClient):
             self.data = self.parse_set_load_response(response)
             self.on_write_operation_complete(self, self.data)
         else:
+            # read is handled in base class
             super().on_data_received(response)
 
     def on_read_operation_complete(self):
@@ -77,7 +78,7 @@ class RoverClient(BaseClient):
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['model'] = (bs[3:17]).decode('utf-8')
         return data
-    
+
     def parse_chargin_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
