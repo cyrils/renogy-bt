@@ -27,7 +27,7 @@ INFO:root:Init RoverClient: BT-TH-B00FXXXX => 80:6F:B0:0F:XX:XX
 INFO:root:Adapter status - Powered: True
 INFO:root:Starting discovery...
 INFO:root:Devices found: 5
-INFO:root:Found bt1 device BT-TH-B00FXXXX  [80:6F:B0:0F:XX:XX]
+INFO:root:Found matching device BT-TH-B00FXXXX => [80:6F:B0:0F:XX:XX]
 INFO:root:[80:6f:b0:0f:XX:XX] Discovered, alias = BT-TH-B00FXXXX
 INFO:root:[80:6F:B0:0F:XX:XX] Connected
 INFO:root:[80:6F:B0:0F:XX:XX] Resolved services
@@ -101,6 +101,7 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy Rover Elite | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT (Built-in Bluetooth) | - | ✅ |
+| Renogy Battery RBT50LFP48S | BT-2 | ❓ |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
 
