@@ -19,7 +19,7 @@ class BatteryClient(BaseClient):
         self.device_id = DEVICE_ID
         self.sections = [
             {'register': 5000, 'words': 17, 'parser': self.parse_cell_volt_info},
-            {'register': 5017, 'words': 17, 'parser': self.parse_cell_temp_info},
+            {'register': 5017, 'words': 18, 'parser': self.parse_cell_temp_info},
             {'register': 5042, 'words': 6, 'parser': self.parse_battery_info},
             {'register': 5122, 'words': 8, 'parser': self.parse_device_info}
         ]
@@ -35,6 +35,7 @@ class BatteryClient(BaseClient):
         data['cell_count'] = bytes_to_int(bs, 3, 2)
         for i in range(0, data['cell_count']):
             data[f'cell_voltage_{i}'] = bytes_to_int(bs, 5 + i*2, 2) * 0.1
+        return data
 
     def parse_cell_temp_info(self, bs):
         data = {}
