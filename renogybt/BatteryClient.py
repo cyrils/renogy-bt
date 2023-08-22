@@ -18,8 +18,8 @@ class BatteryClient(BaseClient):
         self.data = {}
         self.device_id = DEVICE_ID
         self.sections = [
-            {'register': 5000, 'words': 17, 'parser': self.parse_cell_volt_info},
-            {'register': 5017, 'words': 18, 'parser': self.parse_cell_temp_info},
+            {'register': 5000, 'words': 18, 'parser': self.parse_cell_volt_info},
+            {'register': 5017, 'words': 17, 'parser': self.parse_cell_temp_info},
             {'register': 5042, 'words': 6, 'parser': self.parse_battery_info},
             {'register': 5122, 'words': 8, 'parser': self.parse_device_info}
         ]
