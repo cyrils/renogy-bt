@@ -114,8 +114,9 @@ class RoverClient(BaseClient):
     def parse_historical_data(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
+        data['history'] = []
         for i in range(0, 9):
-            data[f'cell_voltage_{i}'] = bytes_to_int(bs, 3 + i*2, 2)
+            data['history'].append(bytes_to_int(bs, 3 + i*2, 2))
         return data
 
     def parse_set_load_response(self, bs):
