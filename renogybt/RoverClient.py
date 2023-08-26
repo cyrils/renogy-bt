@@ -45,7 +45,8 @@ class RoverClient(BaseClient):
         self.sections = [
             {'register': 12, 'words': 8, 'parser': self.parse_device_info},
             {'register': 256, 'words': 34, 'parser': self.parse_chargin_info},
-            {'register': 57348, 'words': 1, 'parser': self.parse_battery_type}
+            {'register': 57348, 'words': 1, 'parser': self.parse_battery_type},
+            {'register': 61440, 'words': 10, 'parser': self.parse_historical_data}
         ]
         self.set_load_params = {'function': 6, 'register': 266}
 
@@ -108,6 +109,13 @@ class RoverClient(BaseClient):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['battery_type'] = BATTERY_TYPE.get(bytes_to_int(bs, 3, 2))
+        return data
+    
+    def parse_historical_data(self, bs):
+        data = {}
+        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
+        for i in range(0, 9):
+            data[f'cell_voltage_{i}'] = bytes_to_int(bs, 3 + i*2, 2)
         return data
 
     def parse_set_load_response(self, bs):
