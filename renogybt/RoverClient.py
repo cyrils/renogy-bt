@@ -112,10 +112,11 @@ class RoverClient(BaseClient):
         return data
     
     def parse_historical_data(self, bs):
+        logging.info(f"parse_historical_data {bs.hex()}")
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['history'] = []
-        for i in range(0, 9):
+        for i in range(0, 10):
             data['history'].append(bytes_to_int(bs, 3 + i*2, 2))
         return data
 
