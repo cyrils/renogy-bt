@@ -104,7 +104,7 @@ class RoverClient(BaseClient):
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['battery_type'] = BATTERY_TYPE.get(bytes_to_int(bs, 3, 2))
         return data
-    
+
     def parse_set_load_response(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))

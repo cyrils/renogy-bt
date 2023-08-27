@@ -18,6 +18,7 @@ class RoverHistoryClient(BaseClient):
         super().__init__(config)
         self.on_data_callback = on_data_callback
         self.data = {
+            'function': 'READ',
             'power_generation': [],
             'amp_hours': [],
             'max_power': []
@@ -33,6 +34,7 @@ class RoverHistoryClient(BaseClient):
             {'register': 61446, 'words': 10, 'parser': self.parse_historical_data}
         ]
 
+    # override
     def on_data_received(self, response):
         operation = bytes_to_int(response, 1, 1)
         if operation == 3: # read operation
@@ -55,5 +57,5 @@ class RoverHistoryClient(BaseClient):
         data = {}
         data['power_generation'] = bytes_to_int(bs, 19, 2)
         data['amp_hours'] = bytes_to_int(bs, 15, 2)
-        data['max_power'] = bytes_to_int(bs, 13, 2)
+        data['max_power'] = bytes_to_int(bs, 11, 2)
         return data
