@@ -9,7 +9,6 @@ from .BLE import DeviceManager, Device
 # Base class that works with all Renogy family devices
 # Should be extended by each client with its own parsers and section definitions
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
-# Two sections cannot have same word length (important)
 
 ALIAS_PREFIX = 'BT-TH'
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
@@ -79,7 +78,8 @@ class BaseClient:
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
-        self.data['__device'] = self.config['device']['alias']
+        self.data['_device'] = self.config['device']['alias']
+        self.data['_client'] = self.__class__.__name__
         if self.on_data_callback is not None:
             self.on_data_callback(self, self.data)
 
