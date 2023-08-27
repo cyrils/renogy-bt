@@ -72,7 +72,8 @@ class BaseClient:
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
-        # to be implemented by subclass
+        if self.on_data_callback is not None:
+            self.on_data_callback(self, self.data)
 
     def poll_data(self):
         self.read_section()

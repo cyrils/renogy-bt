@@ -1,9 +1,7 @@
 import logging
 import configparser
 import os
-from renogybt import RoverClient
-from renogybt import BatteryClient
-from renogybt import DataLogger
+from renogybt import RoverClient, RoverHistoryClient, BatteryClient, DataLogger
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -27,6 +25,8 @@ def on_data_received(client, data):
 # start client
 if config['device']['type'] == 'RNG_CTRL':
     RoverClient(config, on_data_received).connect() 
+elif config['device']['type'] == 'RNG_CTRL_HIST':
+    RoverHistoryClient(config, on_data_received).connect() 
 elif config['device']['type'] == 'RNG_BATT':
     BatteryClient(config, on_data_received).connect()
 else: 

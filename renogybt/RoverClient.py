@@ -45,8 +45,7 @@ class RoverClient(BaseClient):
         self.sections = [
             {'register': 12, 'words': 8, 'parser': self.parse_device_info},
             {'register': 256, 'words': 34, 'parser': self.parse_chargin_info},
-            {'register': 57348, 'words': 1, 'parser': self.parse_battery_type},
-            {'register': 61440, 'words': 10, 'parser': self.parse_historical_data}
+            {'register': 57348, 'words': 1, 'parser': self.parse_battery_type}
         ]
         self.set_load_params = {'function': 6, 'register': 266}
 
@@ -58,11 +57,6 @@ class RoverClient(BaseClient):
         else:
             # read is handled in base class
             super().on_data_received(response)
-
-    def on_read_operation_complete(self):
-        logging.info("on_read_operation_complete")
-        if self.on_data_callback is not None:
-            self.on_data_callback(self, self.data)
 
     def on_write_operation_complete(self):
         logging.info("on_write_operation_complete")
@@ -111,15 +105,6 @@ class RoverClient(BaseClient):
         data['battery_type'] = BATTERY_TYPE.get(bytes_to_int(bs, 3, 2))
         return data
     
-    def parse_historical_data(self, bs):
-        logging.info(f"parse_historical_data {bs.hex()}")
-        data = {}
-        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['history'] = []
-        for i in range(0, 10):
-            data['history'].append(bytes_to_int(bs, 3 + i*2, 2))
-        return data
-
     def parse_set_load_response(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))

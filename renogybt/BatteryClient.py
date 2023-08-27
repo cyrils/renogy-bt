@@ -24,11 +24,6 @@ class BatteryClient(BaseClient):
             {'register': 5122, 'words': 8, 'parser': self.parse_device_info}
         ]
 
-    def on_read_operation_complete(self):
-        logging.info("on_read_operation_complete")
-        if self.on_data_callback is not None:
-            self.on_data_callback(self, self.data)
-
     def parse_cell_volt_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
