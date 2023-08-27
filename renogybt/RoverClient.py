@@ -72,7 +72,7 @@ class RoverClient(BaseClient):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['model'] = (bs[3:17]).decode('utf-8')
-        return data
+        self.data.update(data)
 
     def parse_chargin_info(self, bs):
         data = {}
@@ -97,16 +97,16 @@ class RoverClient(BaseClient):
         data['power_consumption_today'] = bytes_to_int(bs, 43, 2)
         data['power_generation_total'] = bytes_to_int(bs, 59, 4)
         data['charging_status'] = CHARGING_STATE.get(bytes_to_int(bs, 68, 1))
-        return data
+        self.data.update(data)
 
     def parse_battery_type(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['battery_type'] = BATTERY_TYPE.get(bytes_to_int(bs, 3, 2))
-        return data
+        self.data.update(data)
 
     def parse_set_load_response(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['load_status'] = bytes_to_int(bs, 5, 1)
-        return data
+        self.data.update(data)

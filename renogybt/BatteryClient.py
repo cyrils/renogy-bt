@@ -18,7 +18,7 @@ class BatteryClient(BaseClient):
         self.data = {}
         self.device_id = DEVICE_ID
         self.sections = [
-            {'register': 5000, 'words': 18, 'parser': self.parse_cell_volt_info},
+            {'register': 5000, 'words': 17, 'parser': self.parse_cell_volt_info},
             {'register': 5017, 'words': 17, 'parser': self.parse_cell_temp_info},
             {'register': 5042, 'words': 6, 'parser': self.parse_battery_info},
             {'register': 5122, 'words': 8, 'parser': self.parse_device_info}
@@ -30,7 +30,7 @@ class BatteryClient(BaseClient):
         data['cell_count'] = bytes_to_int(bs, 3, 2)
         for i in range(0, data['cell_count']):
             data[f'cell_voltage_{i}'] = bytes_to_int(bs, 5 + i*2, 2) * 0.1
-        return data
+        self.data.update(data)
 
     def parse_cell_temp_info(self, bs):
         data = {}
@@ -38,7 +38,7 @@ class BatteryClient(BaseClient):
         data['sensor_count'] = bytes_to_int(bs, 3, 2)
         for i in range(0, data['sensor_count']):
             data[f'temperature_{i}'] = bytes_to_int(bs, 5 + i*2, 2) * 0.1
-        return data
+        self.data.update(data)
 
     def parse_battery_info(self, bs):
         data = {}
@@ -47,10 +47,10 @@ class BatteryClient(BaseClient):
         data['voltage'] = bytes_to_int(bs, 5, 2) * 0.1
         data['remaining_charge'] = bytes_to_int(bs, 7, 4) * 0.001
         data['capacity'] = bytes_to_int(bs, 11, 4) * 0.001
-        return data
+        self.data.update(data)
 
     def parse_device_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['model'] = (bs[3:17]).decode('utf-8')
-        return data
+        self.data.update(data)
