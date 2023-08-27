@@ -72,6 +72,7 @@ class BaseClient:
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
+        self.data['__device'] = self.config['device']['alias']
         if self.on_data_callback is not None:
             self.on_data_callback(self, self.data)
 
