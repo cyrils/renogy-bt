@@ -53,7 +53,7 @@ class RoverHistoryClient(BaseClient):
 
     def parse_historical_data(self, bs):
         data = {}
-        data['power_generation'].append(bytes_to_int(bs, 19, 2))
-        data['amp_hours'].append(bytes_to_int(bs, 15, 2))
-        data['max_power'].append(bytes_to_int(bs, 13, 2))
+        data['power_generation'] = bytes_to_int(bs, 19, 2)
+        data['amp_hours'] = bytes_to_int(bs, 15, 2)
+        data['max_power'] = bytes_to_int(bs, 13, 2)
         return data
