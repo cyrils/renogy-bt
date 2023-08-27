@@ -78,8 +78,8 @@ class BaseClient:
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
-        self.data['_device'] = self.config['device']['alias']
-        self.data['_client'] = self.__class__.__name__
+        self.data['__device'] = self.config['device']['alias']
+        self.data['__client'] = self.__class__.__name__
         if self.on_data_callback is not None:
             self.on_data_callback(self, self.data)
 
