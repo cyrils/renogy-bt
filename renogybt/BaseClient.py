@@ -9,7 +9,6 @@ from .BLE import DeviceManager, Device
 # Base class that works with all Renogy family devices
 # Should be extended by each client with its own parsers and section definitions
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
-# Two sections cannot have same word length (important)
 
 ALIAS_PREFIX = 'BT-TH'
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
@@ -24,6 +23,7 @@ class BaseClient:
         self.data = {}
         self.device_id = None
         self.sections = []
+        self.section_index = 0
         logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
 
     def connect(self):
@@ -57,22 +57,31 @@ class BaseClient:
 
     def on_data_received(self, response):
         operation = bytes_to_int(response, 1, 1)
+
         if operation == 3: # read operation
             logging.info("on_data_received: response for read operation")
-            index, section = self.find_section_by_response(response)
-            parsed_data = section['parser'](response) if section['parser'] != None else {}
-            self.data.update(parsed_data)
-            if index >= len(self.sections) - 1: # last section
+            if (self.section_index < len(self.sections) and
+                self.sections[self.section_index]['parser'] != None and
+                self.sections[self.section_index]['words'] * 2 + 5 == len(response)):
+                # parse and update data
+                self.sections[self.section_index]['parser'](response)
+
+            if self.section_index >= len(self.sections) - 1: # last section, read complete
+                self.section_index = 0
                 self.on_read_operation_complete()
                 self.data = {}
             else:
-                self.read_section(index + 1)
+                self.section_index += 1
+                self.read_section()
         else:
             logging.warn("on_data_received: unknown operation={}".format(operation))
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
-        # to be implemented by subclass
+        self.data['__device'] = self.config['device']['alias']
+        self.data['__client'] = self.__class__.__name__
+        if self.on_data_callback is not None:
+            self.on_data_callback(self, self.data)
 
     def poll_data(self):
         self.read_section()
@@ -81,18 +90,12 @@ class BaseClient:
         self.timer = Timer(self.config['device'].getint('poll_interval'), self.poll_data)
         self.timer.start()
 
-    def read_section(self, index = 0):
+    def read_section(self):
+        index = self.section_index
         if self.device_id == None or len(self.sections) == 0:
             return logging.error("base client cannot be used directly")
         request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words']) 
         self.device.characteristic_write_value(request)
-
-    def find_section_by_response(self, response):
-        length = len(response)
-        for index, param in enumerate(self.sections):
-            if param['words'] * 2 + 5 == length:
-                return index, param
-        return None
 
     def create_generic_read_request(self, device_id, function, regAddr, readWrd):                             
         data = None                                
