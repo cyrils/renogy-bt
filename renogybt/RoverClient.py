@@ -71,7 +71,7 @@ class RoverClient(BaseClient):
     def parse_device_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['model'] = (bs[3:17]).decode('utf-8')
+        data['model'] = (bs[3:17]).decode('utf-8').strip()
         self.data.update(data)
 
     def parse_chargin_info(self, bs):
