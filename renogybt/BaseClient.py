@@ -110,7 +110,7 @@ class BaseClient:
 
             crc = libscrc.modbus(bytes(data))
             crc1 = crc16(bytes(data))
-            crc2 = crc16_mini(bytes(data))
+            crc2 = crc16_mini(bytes(data), 0, len(data))
             logging.info(f"crc = {crc} crc1= {crc1} crc2={crc2}")
             data.append(int_to_bytes(crc, 1))
             data.append(int_to_bytes(crc, 0))
