@@ -110,8 +110,8 @@ class BaseClient:
             # crc = libscrc.modbus(bytes(data))
             crc = crc16(bytes(data))
             # crc2 = crc16_mini(bytes(data), 0, len(data))
-            data.append(crc[1])
             data.append(crc[0])
+            data.append(crc[1])
             logging.debug("{} {} => {}".format("create_request_payload", regAddr, data))
         return data
 
