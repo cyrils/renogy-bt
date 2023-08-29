@@ -2,8 +2,7 @@ import os
 from threading import Timer
 import logging
 import configparser
-import libscrc
-from .Utils import bytes_to_int, int_to_bytes, crc16, crc16_mini
+from .Utils import bytes_to_int, int_to_bytes, crc16
 from .BLE import DeviceManager, Device
 
 # Base class that works with all Renogy family devices
@@ -108,12 +107,11 @@ class BaseClient:
             data.append(int_to_bytes(readWrd, 0))
             data.append(int_to_bytes(readWrd, 1))
 
-            crc = libscrc.modbus(bytes(data))
-            crc1 = crc16(bytes(data))
-            crc2 = crc16_mini(bytes(data), 0, len(data))
-            logging.info(f"crc = {crc} crc1= {crc1} crc2={crc2}")
-            data.append(int_to_bytes(crc, 1))
-            data.append(int_to_bytes(crc, 0))
+            # crc = libscrc.modbus(bytes(data))
+            crc = crc16(bytes(data))
+            # crc2 = crc16_mini(bytes(data), 0, len(data))
+            data.append(crc[1])
+            data.append(crc[0])
             logging.debug("{} {} => {}".format("create_request_payload", regAddr, data))
         return data
 
