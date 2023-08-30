@@ -1,9 +1,9 @@
 # Renogy BT
 ![256924763-940c205e-738d-4a68-982f-1695c80bfed5](https://github.com/cyrils/renogy-bt/assets/5549113/bcdef6ec-efc9-44fd-af70-67165cf6862e)
 
-Python library to read Renogy RS232 compatible solar charge controllers using [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) bluetooth module. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. It supports periodic data polling and can also log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
+Python library to read Renogy Solar Charge Controllers and Smart Batteries using RS232 type [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. Does not support reading multiple devices connected to a communication hub. See a complete list of [compatible devices](#compatibility).
 
-This was also found working with RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) module, but will fail if multiple devices are connected to communication hub, like renogy battery. However standalone Renogy LiFePO4 smart batteries are supported. See a complete list of [compatible devices](#compatibility).
+It supports periodic data polling and can also log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
 
 ## Example
 Each device needs a separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) file. Update  config file with correct values for `mac_addr`, `alias` and `type` and run the following command:
