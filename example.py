@@ -17,6 +17,8 @@ def on_data_received(client, data):
     logging.debug("{} => {}".format(client.device.alias(), data))
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=data)
+    if config['google_sheets'].getboolean('enabled'):
+        data_logger.log_google_sheets(json_data=data)
     if config['mqtt'].getboolean('enabled'):
         data_logger.log_mqtt(json_data=data)
     if config['pvoutput'].getboolean('enabled') and config['device']['type'] == 'RNG_CTRL':
