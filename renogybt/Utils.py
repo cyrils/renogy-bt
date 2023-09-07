@@ -76,3 +76,6 @@ def crc16_modbus(data: bytes):
         crc_low = CRC16_LOW_BYTES[index]
 
     return bytes([crc_high, crc_low])
+
+def celcius_to_farhenheit(celcius):
+    return (celcius * 9/5) + 32

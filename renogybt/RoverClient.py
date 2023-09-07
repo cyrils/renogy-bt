@@ -1,6 +1,6 @@
 import logging
 from .BaseClient import BaseClient
-from .Utils import bytes_to_int, parse_temperature
+from .Utils import bytes_to_int, parse_temperature, celcius_to_farhenheit
 
 # Read and parse BT-1 RS232 type bluetooth module connected to Renogy Rover/Wanderer/Adventurer
 # series charge controllers. Also works with BT-2 RS485 module on Rover Elite, DC Charger etc.
@@ -80,8 +80,8 @@ class RoverClient(BaseClient):
         data['battery_percentage'] = bytes_to_int(bs, 3, 2)
         data['battery_voltage'] = bytes_to_int(bs, 5, 2) * 0.1
         data['battery_current'] = bytes_to_int(bs, 7, 2) * 0.01
-        data['battery_temperature'] = parse_temperature(bytes_to_int(bs, 10, 1))
-        data['controller_temperature'] = parse_temperature(bytes_to_int(bs, 9, 1))
+        data['battery_temperature'] = self.parse_temperature(bytes_to_int(bs, 10, 1))
+        data['controller_temperature'] = self.parse_temperature(bytes_to_int(bs, 9, 1))
         data['load_status'] = LOAD_STATE.get(bytes_to_int(bs, 67, 1) >> 7)
         data['load_voltage'] = bytes_to_int(bs, 11, 2) * 0.1
         data['load_current'] = bytes_to_int(bs, 13, 2) * 0.01
@@ -110,3 +110,10 @@ class RoverClient(BaseClient):
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['load_status'] = bytes_to_int(bs, 5, 1)
         self.data.update(data)
+
+    def parse_temperature(self, value):
+        temperature = parse_temperature(value)
+        temperature_unit = self.config['device']['temperature_unit']
+        if temperature_unit == 'F':
+            return celcius_to_farhenheit(temperature)
+        return temperature
