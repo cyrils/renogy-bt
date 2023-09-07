@@ -79,3 +79,9 @@ def crc16_modbus(data: bytes):
 
 def celcius_to_farhenheit(celcius):
     return (celcius * 9/5) + 32
+
+def filter_fields(data, fields_str):
+    fields = [x.strip() for x in fields_str.split(',')] if len(fields_str) > 0 else [] # trim spaces
+    if len(fields) > 0 and set(fields).issubset(data):
+        return {key: data[key] for key in fields}
+    return data
