@@ -2,6 +2,7 @@ import os
 from threading import Timer
 import logging
 import configparser
+import time
 from .Utils import bytes_to_int, int_to_bytes, crc16_modbus
 from .BLE import DeviceManager, Device
 
@@ -71,6 +72,7 @@ class BaseClient:
                 self.data = {}
             else:
                 self.section_index += 1
+                time.sleep(0.5)
                 self.read_section()
         else:
             logging.warn("on_data_received: unknown operation={}".format(operation))
