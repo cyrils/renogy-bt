@@ -53,7 +53,7 @@ class BaseClient:
 
     def __on_resolved(self):
         logging.info("resolved services")
-        self.poll_data() if self.config['device'].getboolean('enable_polling') == True else self.read_section()
+        self.poll_data() if self.config['data'].getboolean('enable_polling') == True else self.read_section()
 
     def on_data_received(self, response):
         operation = bytes_to_int(response, 1, 1)
@@ -88,7 +88,7 @@ class BaseClient:
         self.read_section()
         if self.timer is not None and self.timer.is_alive():
             self.timer.cancel()
-        self.timer = Timer(self.config['device'].getint('poll_interval'), self.poll_data)
+        self.timer = Timer(self.config['data'].getint('poll_interval'), self.poll_data)
         self.timer.start()
 
     def read_section(self):

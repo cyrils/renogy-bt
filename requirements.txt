@@ -1,3 +1,2 @@
 gatt
 paho-mqtt
-gspread

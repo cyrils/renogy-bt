@@ -1,7 +1,6 @@
 import json
 import logging
 import requests
-import gspread
 import paho.mqtt.publish as publish
 from configparser import ConfigParser
 from datetime import datetime
@@ -39,22 +38,3 @@ class DataLogger:
             "X-Pvoutput-SystemId":  self.config['pvoutput']['system_id']
         })
         print(f"pvoutput {response}")
-
-    def is_first_row_empty(worksheet):
-        return len(worksheet.row_values(1)) == 0
-
-    def log_google_sheets(self, json_data):
-        now = datetime.now()
-        dt_string = now.strftime("%m/%d/%Y %H:%M:%S")
-        sheet_id = self.config['google_sheets']['sheet_id']
-        worksheet_name = self.config['google_sheets']['worksheet_name']
-        credentials_file = self.config['google_sheets']['credentials_file']
-        sa = gspread.service_account(filename=credentials_file)
-        sh = sa.open_by_key(sheet_id)
-        wks = sh.worksheet(worksheet_name)
-        output = json_data
-        values = [dt_string] + list(output.values())
-        if DataLogger.is_first_row_empty(wks):
-          keys = ["Date/Time"] + list(output.keys())
-          wks.append_row(keys)
-        wks.append_row(values)
