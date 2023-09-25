@@ -22,10 +22,19 @@ def int_to_bytes(i, pos = 0):
         return int(format(i, '016b')[8:], 2)
     return 0
 
-def parse_temperature(raw_value):
+def parse_temperature(raw_value, unit):
     sign = raw_value >> 7
-    return -(raw_value - 128) if sign == 1 else raw_value
+    celcius = -(raw_value - 128) if sign == 1 else raw_value
+    return format_temperature(celcius, unit)
 
+def format_temperature(celcius, unit = 'F'):
+    return (celcius * 9/5) + 32 if unit.strip() == 'F' else celcius
+
+def filter_fields(data, fields_str):
+    fields = [x.strip() for x in fields_str.split(',')] if len(fields_str) > 0 else [] # trim spaces
+    if len(fields) > 0 and set(fields).issubset(data):
+        return {key: data[key] for key in fields}
+    return data
 
 CRC16_LOW_BYTES = (
     0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02, 0xC2, 0xC6, 0x06, 0x07, 0xC7, 0x05, 0xC5, 0xC4, 0x04,
