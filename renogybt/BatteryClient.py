@@ -60,5 +60,5 @@ class BatteryClient(BaseClient):
     def parse_device_address(self, bs):
         logging.info(bs.hex())
         data = {}
-        data['device_id'] = bytes_to_int(bs, 4, 1)
+        data['device_id'] = bytes_to_int(bs, 3, 2)
         self.data.update(data)
