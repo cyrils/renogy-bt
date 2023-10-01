@@ -15,12 +15,13 @@ class BatteryClient(BaseClient):
         super().__init__(config)
         self.on_data_callback = on_data_callback
         self.data = {}
-        self.device_id = DEVICE_ID
+        self.device_id = self.device_id or DEVICE_ID
         self.sections = [
             {'register': 5000, 'words': 17, 'parser': self.parse_cell_volt_info},
             {'register': 5017, 'words': 17, 'parser': self.parse_cell_temp_info},
             {'register': 5042, 'words': 6, 'parser': self.parse_battery_info},
-            {'register': 5122, 'words': 8, 'parser': self.parse_device_info}
+            {'register': 5122, 'words': 8, 'parser': self.parse_device_info},
+            {'register': 5223, 'words': 1, 'parser': self.parse_device_address}
         ]
 
     def parse_cell_volt_info(self, bs):
@@ -53,4 +54,9 @@ class BatteryClient(BaseClient):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['model'] = (bs[3:17]).decode('utf-8')
+        self.data.update(data)
+
+    def parse_device_address(self, bs):
+        data = {}
+        data['device_id'] = bytes_to_int(bs, 4, 1)
         self.data.update(data)

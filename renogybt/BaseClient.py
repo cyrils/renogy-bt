@@ -13,15 +13,17 @@ from .BLE import DeviceManager, Device
 ALIAS_PREFIX = 'BT-TH'
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
+READ_TIMEOUT = 30 # (seconds)
 
 class BaseClient:
     def __init__(self, config):
         self.config: configparser.ConfigParser = config
         self.manager = None
         self.device = None
-        self.timer = None
+        self.poll_timer = None
+        self.read_timer = None
         self.data = {}
-        self.device_id = None
+        self.device_id = self.config['device'].getint('device_id')
         self.sections = []
         self.section_index = 0
         logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
@@ -56,6 +58,7 @@ class BaseClient:
         self.poll_data() if self.config['data'].getboolean('enable_polling') == True else self.read_section()
 
     def on_data_received(self, response):
+        self.read_timer.cancel()
         operation = bytes_to_int(response, 1, 1)
 
         if operation == 3: # read operation
@@ -84,12 +87,16 @@ class BaseClient:
         if self.on_data_callback is not None:
             self.on_data_callback(self, self.data)
 
+    def on_read_timeout(self):
+        logging.error("on_read_timeout, please check device_id")
+        self.disconnect()
+
     def poll_data(self):
         self.read_section()
-        if self.timer is not None and self.timer.is_alive():
-            self.timer.cancel()
-        self.timer = Timer(self.config['data'].getint('poll_interval'), self.poll_data)
-        self.timer.start()
+        if self.poll_timer is not None and self.poll_timer.is_alive():
+            self.poll_timer.cancel()
+        self.poll_timer = Timer(self.config['data'].getint('poll_interval'), self.poll_data)
+        self.poll_timer.start()
 
     def read_section(self):
         index = self.section_index
@@ -97,6 +104,8 @@ class BaseClient:
             return logging.error("base client cannot be used directly")
         request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words']) 
         self.device.characteristic_write_value(request)
+        self.read_timer = Timer(READ_TIMEOUT, self.on_read_timeout)
+        self.read_timer.start()
 
     def create_generic_read_request(self, device_id, function, regAddr, readWrd):                             
         data = None                                
@@ -124,7 +133,8 @@ class BaseClient:
         self.__stop_service()
 
     def __stop_service(self):
-        if self.timer is not None and self.timer.is_alive():
-            self.timer.cancel()
+        if self.poll_timer is not None and self.poll_timer.is_alive():
+            self.poll_timer.cancel()
+        if self.poll_timer is not None: self.read_timer.cancel()
         self.manager.stop()
         os._exit(os.EX_OK)

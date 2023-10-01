@@ -1,7 +1,7 @@
 # Renogy BT
 ![256924763-940c205e-738d-4a68-982f-1695c80bfed5](https://github.com/cyrils/renogy-bt/assets/5549113/bcdef6ec-efc9-44fd-af70-67165cf6862e)
 
-Python library to read Renogy Solar Charge Controllers and Smart Batteries using RS232 type [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. Does not support reading multiple devices connected to a communication hub. See a complete list of [compatible devices](#compatibility).
+Python library to read Renogy Solar Charge Controllers and Smart Batteries using RS232 type [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See a complete list of [compatible devices](#compatibility).
 
 It supports periodic data polling and can also log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
 
@@ -112,6 +112,10 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy Battery RBT50LFP48S | BT-2 | ❓ |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
+
+**Note:**  
+
+If you have multiple devices connected to a single bt module (daisy chained or using communication hub), you need to find out the individual device Id (aka address) of each of these devices. Connect one device at a time to figure out this from output log. The default broadcast address of 255 will work only for single devices.
 
 ## References
 

@@ -41,9 +41,10 @@ class RoverClient(BaseClient):
         super().__init__(config)
         self.on_data_callback = on_data_callback
         self.data = {}
-        self.device_id = DEVICE_ID
+        self.device_id = self.device_id or DEVICE_ID
         self.sections = [
             {'register': 12, 'words': 8, 'parser': self.parse_device_info},
+            {'register': 26, 'words': 1, 'parser': self.parse_device_address},
             {'register': 256, 'words': 34, 'parser': self.parse_chargin_info},
             {'register': 57348, 'words': 1, 'parser': self.parse_battery_type}
         ]
@@ -72,6 +73,12 @@ class RoverClient(BaseClient):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['model'] = (bs[3:17]).decode('utf-8').strip()
+        self.data.update(data)
+
+    def parse_device_address(self, bs):
+        logging.info(bs.hex())
+        data = {}
+        data['device_id'] = bytes_to_int(bs, 4, 1)
         self.data.update(data)
 
     def parse_chargin_info(self, bs):
