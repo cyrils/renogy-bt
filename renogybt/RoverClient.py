@@ -33,7 +33,7 @@ BATTERY_TYPE = {
     2: 'sealed',
     3: 'gel',
     4: 'lithium',
-    5: 'self-customized'
+    5: 'custom'
 }
 
 class RoverClient(BaseClient):

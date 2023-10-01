@@ -57,6 +57,8 @@ DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'ce
 python3 -m pip install -r requirements.txt
 ```
 
+This library is primarily designed to work with **Raspberry Pi OS**, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments.
+
 ## Data logging
 
 Supports logging data to local MQTT brokers like [Mosquitto](https://mosquitto.org/) or [Home Assistant](https://www.home-assistant.io/) dashboards. You can also log it to third party cloud services like [PVOutput](https://pvoutput.org/). See [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) for more details. Note that free PVOutput accounts have a cap of one request per minute.
@@ -66,11 +68,13 @@ Example config to add to your home assistant `configuration.yaml`:
 mqtt:
   sensor:
     - name: "Solar Power"
-      state_topic: "solar/stats"
+      state_topic: "solar/state"
+      device_class: "power"
       unit_of_measurement: "W"
       value_template: "{{ value_json.pv_power }}"
     - name: "Battery SOC"
-      state_topic: "solar/stats"
+      state_topic: "solar/state"
+      device_class: "battery"
       unit_of_measurement: "%"
       value_template: "{{ value_json.battery_percentage }}"
 # check output log for more fields
@@ -92,9 +96,9 @@ $json_data = json_decode(file_get_contents('php://input'), true);
 
 **How to get continues output?**
 
- The best way to get continues data is to schedule a cronjob by running `crontab -e` and insert the following code:
+ The best way to get continues data is to schedule a cronjob by running `crontab -e` and insert the following command:
 ```sh
-*/5 * * * * python3 /path/to/renogy-bt/example.py #runs every 5 mins
+*/5 * * * * python3 /path/to/renogy-bt/example.py config.ini #runs every 5 mins
 ```
 If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may also register it as a [service](https://gist.github.com/emxsys/a507f3cad928e66f6410e7ac28e2990f) for added reliability.
 
@@ -108,9 +112,6 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy Battery RBT50LFP48S | BT-2 | ❓ |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
-
-## Runtime compatibility
-Due to a dependency being implemented to only work on Linux, this also requires a Linux host in order to function.
 
 ## References
 
