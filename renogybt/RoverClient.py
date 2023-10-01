@@ -41,7 +41,7 @@ class RoverClient(BaseClient):
         super().__init__(config)
         self.on_data_callback = on_data_callback
         self.data = {}
-        self.device_id = self.device_id or DEVICE_ID
+        self.device_id = self.device_id
         self.sections = [
             {'register': 12, 'words': 8, 'parser': self.parse_device_info},
             {'register': 26, 'words': 1, 'parser': self.parse_device_address},
@@ -86,16 +86,16 @@ class RoverClient(BaseClient):
         temp_unit = self.config['data']['temperature_unit']
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['battery_percentage'] = bytes_to_int(bs, 3, 2)
-        data['battery_voltage'] = bytes_to_int(bs, 5, 2) * 0.1
-        data['battery_current'] = bytes_to_int(bs, 7, 2) * 0.01
+        data['battery_voltage'] = bytes_to_int(bs, 5, 2, scale = 0.1)
+        data['battery_current'] = bytes_to_int(bs, 7, 2, scale = 0.01)
         data['battery_temperature'] = parse_temperature(bytes_to_int(bs, 10, 1), temp_unit)
         data['controller_temperature'] = parse_temperature(bytes_to_int(bs, 9, 1), temp_unit)
         data['load_status'] = LOAD_STATE.get(bytes_to_int(bs, 67, 1) >> 7)
-        data['load_voltage'] = bytes_to_int(bs, 11, 2) * 0.1
-        data['load_current'] = bytes_to_int(bs, 13, 2) * 0.01
+        data['load_voltage'] = bytes_to_int(bs, 11, 2, scale = 0.1)
+        data['load_current'] = bytes_to_int(bs, 13, 2, scale = 0.01)
         data['load_power'] = bytes_to_int(bs, 15, 2)
-        data['pv_voltage'] = bytes_to_int(bs, 17, 2) * 0.1
-        data['pv_current'] = bytes_to_int(bs, 19, 2) * 0.01
+        data['pv_voltage'] = bytes_to_int(bs, 17, 2, scale = 0.1) 
+        data['pv_current'] = bytes_to_int(bs, 19, 2, scale = 0.01)
         data['pv_power'] = bytes_to_int(bs, 21, 2)
         data['max_charging_power_today'] = bytes_to_int(bs, 33, 2)
         data['max_discharging_power_today'] = bytes_to_int(bs, 35, 2)

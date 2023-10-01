@@ -113,9 +113,7 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
 
-**Note:**  
-
-If you have multiple devices connected to a single bt module (daisy chained or using communication hub), you need to find out the individual device Id (aka address) of each of these devices. Connect one device at a time to figure out this from output log. The default broadcast address of 255 will work only for single devices.
+**Note:** If you have multiple devices connected to a single BT module (daisy chained or using communication hub), you need to find out the individual device Id (aka address) of each of these devices. Connect a single device at a time and use the default broadcast address of 255 to find out the actual `device_id` from output log.
 
 ## References
 
