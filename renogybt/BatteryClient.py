@@ -1,3 +1,4 @@
+import logging
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int, format_temperature
 
@@ -57,6 +58,7 @@ class BatteryClient(BaseClient):
         self.data.update(data)
 
     def parse_device_address(self, bs):
+        logging.info(bs.hex())
         data = {}
         data['device_id'] = bytes_to_int(bs, 4, 1)
         self.data.update(data)
