@@ -16,10 +16,12 @@ python3 ./example.py <config.ini>
 from renogybt import RoverClient
 RoverClient(config, on_data_received).connect()
 ```
-**How to get mac address?**  
+**How to get mac address?**
+
 The library will automatically list possible compatible devices discovered nearby with alias starting `BT-TH`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
 
-**Have multiple devices on Hub mode?**  
+**Have multiple devices on Hub mode?**
+
 If you have multiple devices connected to a single BT-2 module (daisy chained or using Communication Hub), you need to find out the individual device Id (aka address) of each of these devices. Connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode
 
 **Output**
@@ -119,5 +121,6 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 
  - [Olen/solar-monitor](https://github.com/Olen/solar-monitor)
  - [corbinbs/solarshed](https://github.com/corbinbs/solarshed)
- - [Rover 20A/40A Charge Controller—MODBUS Protocol](https://docs.google.com/document/d/1OSW3gluYNK8d_gSz4Bk89LMQ4ZrzjQY6/edit)
+ - [Rover 20A/40A Charge Controller—MODBUS Protocol](https://github.com/cyrils/renogy-bt/files/12787920/ROVER.MODBUS.pdf)
+ - [Lithium Iron Battery BMS Modbus Protocol V1.7](https://github.com/cyrils/renogy-bt/files/12444500/Lithium.Iron.Battery.BMS.Modbus.Protocol.V1.7.zh-CN.en.1.pdf)
 
