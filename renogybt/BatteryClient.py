@@ -4,8 +4,6 @@ from .Utils import bytes_to_int, format_temperature
 
 # Client for Renogy LFP battery with built-in bluetooth / BT-2 module
 
-DEVICE_ID = 48
-
 FUNCTION = {
     3: "READ",
     6: "WRITE"
@@ -58,7 +56,6 @@ class BatteryClient(BaseClient):
         self.data.update(data)
 
     def parse_device_address(self, bs):
-        logging.info(bs.hex())
         data = {}
         data['device_id'] = bytes_to_int(bs, 3, 2)
         self.data.update(data)

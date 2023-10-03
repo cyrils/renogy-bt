@@ -3,8 +3,6 @@ from .Utils import bytes_to_int
 
 # Retrieve last 7 days of historical data from Rover/Wanderer/Adventurer
 
-DEVICE_ID = 255
-
 class RoverHistoryClient(BaseClient):
     def __init__(self, config, on_data_callback=None):
         super().__init__(config)

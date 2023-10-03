@@ -6,8 +6,6 @@ from .Utils import bytes_to_int, parse_temperature
 # series charge controllers. Also works with BT-2 RS485 module on Rover Elite, DC Charger etc.
 # Does not support Communication Hub with multiple devices connected
 
-DEVICE_ID = 255
-
 FUNCTION = {
     3: "READ",
     6: "WRITE"
@@ -76,7 +74,6 @@ class RoverClient(BaseClient):
         self.data.update(data)
 
     def parse_device_address(self, bs):
-        logging.info(bs.hex())
         data = {}
         data['device_id'] = bytes_to_int(bs, 4, 1)
         self.data.update(data)
