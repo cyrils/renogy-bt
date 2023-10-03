@@ -88,7 +88,7 @@ class BaseClient:
             self.on_data_callback(self, self.data)
 
     def on_read_timeout(self):
-        logging.error("on_read_timeout, please check device_id")
+        logging.error("on_read_timeout => please check your device_id!")
         self.disconnect()
 
     def poll_data(self):
