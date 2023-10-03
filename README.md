@@ -115,7 +115,9 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
 
-**Note:** ¹This is not an official library endorsed by the device manufacturer. Renogy and all other trademarks in this repo are the property of their respective owners and their use herein does not imply any sponsorship or endorsement.
+### Disclaimer
+
+¹This is not an official library endorsed by the device manufacturer. Renogy and all other trademarks in this repo are the property of their respective owners and their use herein does not imply any sponsorship or endorsement.
 
 ## References
 
