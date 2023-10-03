@@ -1,7 +1,7 @@
 # Renogy BT
 ![256924763-940c205e-738d-4a68-982f-1695c80bfed5](https://github.com/cyrils/renogy-bt/assets/5549113/bcdef6ec-efc9-44fd-af70-67165cf6862e)
 
-Python library to read Renogy Solar Charge Controllers and Smart Batteries using RS232 type [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. Does not support reading multiple devices connected to a communication hub. See a complete list of [compatible devices](#compatibility).
+Python library to read Renogy Solar Charge Controllers and Smart Batteries using RS232 type [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See a complete list of [compatible devices](#compatibility).
 
 It supports periodic data polling and can also log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
 
@@ -16,9 +16,11 @@ python3 ./example.py <config.ini>
 from renogybt import RoverClient
 RoverClient(config, on_data_received).connect()
 ```
-**How to get mac address?**
-
+**How to get mac address?**  
 The library will automatically list possible compatible devices discovered nearby with alias starting `BT-TH`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
+
+**Have multiple devices on Hub mode?**  
+If you have multiple devices connected to a single BT-2 module (daisy chained or using Communication Hub), you need to find out the individual device Id (aka address) of each of these devices. Connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode
 
 **Output**
 
@@ -39,7 +41,7 @@ DEBUG:root:create_read_request 256 => [255, 3, 1, 0, 0, 34, 209, 241]
 INFO:root:characteristic_write_value_succeeded
 INFO:root:characteristic_enable_notifications_succeeded
 INFO:root:on_data_received: response for read operation
-DEBUG:root:BT-TH-B00FXXXX => {'function': 'READ', 'model': 'RNG-CTRL-WND10', 'battery_percentage': 87, 'battery_voltage': 12.9, 'battery_current': 2.58, 'battery_temperature': 25, 'controller_temperature': 33, 'load_status': 'off', 'load_voltage': 0.0,'load_current': 0.0, 'load_power': 0, 'pv_voltage': 17.1, 'pv_current': 2.04, 'pv_power': 35, 'max_charging_power_today': 143, 'max_discharging_power_today': 0, 'charging_amp_hours_today': 34, 'discharging_amp_hours_today': 34, 'power_generation_today': 432, 'power_consumption_today': 0, 'power_generation_total': 426038, 'charging_status': 'mppt', 'battery_type': 'lithium'}
+DEBUG:root:BT-TH-B00FXXXX => {'function': 'READ', 'model': 'RNG-CTRL-WND10', 'battery_percentage': 87, 'battery_voltage': 12.9, 'battery_current': 2.58, 'battery_temperature': 25, 'controller_temperature': 33, 'load_status': 'off', 'load_voltage': 0.0,'load_current': 0.0, 'load_power': 0, 'pv_voltage': 17.1, 'pv_current': 2.04, 'pv_power': 35, 'max_charging_power_today': 143, 'max_discharging_power_today': 0, 'charging_amp_hours_today': 34, 'discharging_amp_hours_today': 34, 'power_generation_today': 432, 'power_consumption_today': 0, 'power_generation_total': 426038, 'charging_status': 'mppt', 'battery_type': 'lithium', 'device_id': 97}
 INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 ```
 ```
@@ -48,7 +50,7 @@ DEBUG:root:BT-TH-30A3XXXX => {'function': 'READ', 'daily_power_generation': [175
 ```
 ```
 # Battery output
-DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'cell_count': 4, 'cell_voltage_0': 3.6, 'cell_voltage_1': 3.6, 'cell_voltage_2': 3.6, 'cell_voltage_3': 3.6, 'sensor_count': 4, 'temperature_0': 21.0, 'temperature_1': 21.0, 'temperature_2': 21.0, 'temperature_3': 21.0, 'current': 1.4, 'voltage': 14.5, 'remaining_charge': 99.941, 'capacity': 100.0} 
+DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'cell_count': 4, 'cell_voltage_0': 3.6, 'cell_voltage_1': 3.6, 'cell_voltage_2': 3.6, 'cell_voltage_3': 3.6, 'sensor_count': 4, 'temperature_0': 21.0, 'temperature_1': 21.0, 'temperature_2': 21.0, 'temperature_3': 21.0, 'current': 1.4, 'voltage': 14.5, 'remaining_charge': 99.941, 'capacity': 100.0, 'device_id': 48} 
 ```
 
 ## Dependencies
@@ -57,7 +59,7 @@ DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'ce
 python3 -m pip install -r requirements.txt
 ```
 
-This library is primarily designed to work with **Raspberry Pi OS**, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments.
+This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments.
 
 ## Data logging
 

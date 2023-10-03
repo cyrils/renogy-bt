@@ -1,5 +1,5 @@
 # Reads data from a list of bytes, and converts to an int
-def bytes_to_int(bs, offset, length, signed = False):
+def bytes_to_int(bs, offset, length, signed = False, scale = 1):
         ret = 0
         if len(bs) < (offset + length):
             return ret
@@ -11,7 +11,7 @@ def bytes_to_int(bs, offset, length, signed = False):
             byteorder='little'
             start = offset + length + 1
             end = offset + 1
-        return int.from_bytes(bs[start:end], byteorder = byteorder, signed = signed)
+        return round(int.from_bytes(bs[start:end], byteorder = byteorder, signed = signed) * scale, 2)
 
 # Converts an integer into 2 bytes (16 bits)
 # Returns either the first or second byte as an int
