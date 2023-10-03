@@ -39,7 +39,6 @@ class RoverClient(BaseClient):
         super().__init__(config)
         self.on_data_callback = on_data_callback
         self.data = {}
-        self.device_id = self.device_id
         self.sections = [
             {'register': 12, 'words': 8, 'parser': self.parse_device_info},
             {'register': 26, 'words': 1, 'parser': self.parse_device_address},

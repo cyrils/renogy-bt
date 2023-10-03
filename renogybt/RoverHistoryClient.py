@@ -13,7 +13,6 @@ class RoverHistoryClient(BaseClient):
             'daily_charge_ah': [],
             'daily_max_power': []
         }
-        self.device_id = self.device_id
         self.sections = [
             {'register': 61446, 'words': 10, 'parser': self.parse_historical_data},
             {'register': 61445, 'words': 10, 'parser': self.parse_historical_data},

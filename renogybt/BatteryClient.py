@@ -14,7 +14,6 @@ class BatteryClient(BaseClient):
         super().__init__(config)
         self.on_data_callback = on_data_callback
         self.data = {}
-        self.device_id = self.device_id
         self.sections = [
             {'register': 5000, 'words': 17, 'parser': self.parse_cell_volt_info},
             {'register': 5017, 'words': 17, 'parser': self.parse_cell_temp_info},
