@@ -1,9 +1,7 @@
 # Renogy BT
 ![256924763-940c205e-738d-4a68-982f-1695c80bfed5](https://github.com/cyrils/renogy-bt/assets/5549113/bcdef6ec-efc9-44fd-af70-67165cf6862e)
 
-Python library to read Renogy Solar Charge Controllers and Smart Batteries using RS232 type [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See a complete list of [compatible devices](#compatibility).
-
-It supports periodic data polling and can also log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
+Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using RS232 type [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See a complete list of [compatible devices](#compatibility). It can log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
 
 ## Example
 Each device needs a separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) file. Update  config file with correct values for `mac_addr`, `alias` and `type` and run the following command:
@@ -22,7 +20,7 @@ The library will automatically list possible compatible devices discovered nearb
 
 **Have multiple devices on Hub mode?**
 
-If you have multiple devices connected to a single BT-2 module (daisy chained or using Communication Hub), you need to find out the individual device Id (aka address) of each of these devices. Connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode
+If you have multiple devices connected to a single BT-2 module (daisy chained or using [Communication Hub](https://www.renogy.com/communication-hub/)), you need to find out the individual device Id (aka address) of each of these devices. Connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
 
 **Output**
 
@@ -116,6 +114,8 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy Battery RBT50LFP48S | BT-2 | ❓ |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
+
+**Note:** ¹This is not an official library endorsed by the device manufacturer. Renogy and all other trademarks in this repo are the property of their respective owners and their use herein does not imply any sponsorship or endorsement.
 
 ## References
 
