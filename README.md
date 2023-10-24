@@ -110,7 +110,7 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
 | Renogy Rover Elite | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S | BT-2 | ✅ |
-| Renogy Battery RBT100LFP12-BT (Built-in Bluetooth) | - | ✅ |
+| Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
 | Renogy Battery RBT50LFP48S | BT-2 | ❓ |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
