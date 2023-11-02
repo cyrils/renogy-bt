@@ -22,7 +22,7 @@ def on_data_received(client, data):
         data_logger.log_mqtt(json_data=filtered_data)
     if config['pvoutput'].getboolean('enabled') and config['device']['type'] == 'RNG_CTRL':
         data_logger.log_pvoutput(json_data=filtered_data)
-    if not config['device'].getboolean('enable_polling'):
+    if not config['data'].getboolean('enable_polling'):
         client.disconnect()
 
 # start client
