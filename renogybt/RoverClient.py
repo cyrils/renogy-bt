@@ -50,8 +50,9 @@ class RoverClient(BaseClient):
     def on_data_received(self, response):
         operation = bytes_to_int(response, 1, 1)
         if operation == 6: # write operation
-            self.data = self.parse_set_load_response(response)
-            self.on_write_operation_complete(self, self.data)
+            self.parse_set_load_response(response)
+            self.on_write_operation_complete()
+            self.data = {}
         else:
             # read is handled in base class
             super().on_data_received(response)
