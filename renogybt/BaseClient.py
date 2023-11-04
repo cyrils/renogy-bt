@@ -109,7 +109,7 @@ class BaseClient:
 
     def create_generic_read_request(self, device_id, function, regAddr, readWrd):                             
         data = None                                
-        if regAddr and readWrd:
+        if regAddr != None and readWrd != None:
             data = []
             data.append(device_id)
             data.append(function)
