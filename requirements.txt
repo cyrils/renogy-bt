@@ -1,2 +1,7 @@
 gatt
+configparser
+requests
 paho-mqtt
+dbus-python
+pycairo 
+PyGObject
