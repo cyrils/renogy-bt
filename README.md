@@ -20,7 +20,13 @@ The library will automatically list possible compatible devices discovered nearb
 
 **Have multiple devices on Hub mode?**
 
-If you have multiple devices connected to a single BT-2 module (daisy chained or using [Communication Hub](https://www.renogy.com/communication-hub/)), you need to find out the individual device Id (aka address) of each of these devices. Connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
+If you have multiple devices connected to a single BT-2 module (daisy chained or using [Communication Hub](https://www.renogy.com/communication-hub/)), you need to find out the individual device Id (aka address) of each of these devices. Connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode. Below are some of the [usual suspects](#device-ids).
+
+| Device | Stand alone | Daisy chained | Hub mode |
+| -------- | :-------- | :-------- | :-------- |
+|  Controller | 255 | | 97 |
+|  Battery | 48, 247 | 33, 34, 35 | 48, 49 |
+
 
 **Output**
 
