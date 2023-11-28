@@ -7,7 +7,7 @@ Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries usi
 Each device needs a separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) file. Update  config file with correct values for `mac_addr`, `alias` and `type` and run the following command:
 
 ```sh
-python3 ./example.py <config.ini>
+python3 ./example.py config.ini
 ```
  Alternatively, use it as a module with your own custom config and callback function:
 ```python
@@ -17,17 +17,6 @@ RoverClient(config, on_data_received).connect()
 **How to get mac address?**
 
 The library will automatically list possible compatible devices discovered nearby with alias starting `BT-TH`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
-
-**Have multiple devices on Hub mode?**
-
-If you have multiple devices connected to a single BT-2 module (daisy chained or using [Communication Hub](https://www.renogy.com/communication-hub/)), you need to find out the individual device Id (aka address) of each of these devices. Below are some of the usual suspects:
-
-|  | Stand-alone | Daisy-chained | Hub mode |
-| :-------- | :-------- | :-------- | :-------- |
-|  Controller | 255 | ? | 97 |
-|  Battery | 255 | 33, 34, 35 | 48, 49, 50 |
-
- If you receive no response or garbled data with above ids, connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
 
 **Output**
 
@@ -59,6 +48,17 @@ DEBUG:root:BT-TH-30A3XXXX => {'function': 'READ', 'daily_power_generation': [175
 # Battery output
 DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'cell_count': 4, 'cell_voltage_0': 3.6, 'cell_voltage_1': 3.6, 'cell_voltage_2': 3.6, 'cell_voltage_3': 3.6, 'sensor_count': 4, 'temperature_0': 21.0, 'temperature_1': 21.0, 'temperature_2': 21.0, 'temperature_3': 21.0, 'current': 1.4, 'voltage': 14.5, 'remaining_charge': 99.941, 'capacity': 100.0, 'device_id': 48} 
 ```
+
+**Have multiple devices in Hub mode?**
+
+If you have multiple devices connected to a single BT-2 module (daisy chained or using [Communication Hub](https://www.renogy.com/communication-hub/)), you need to find out the individual device Id (aka address) of each of these devices. Below are some of the usual suspects:
+
+|  | Stand-alone | Daisy-chained | Hub mode |
+| :-------- | :-------- | :-------- | :-------- |
+|  Controller | 255 | ? | 97 |
+|  Battery | 255 | 33, 34, 35 | 48, 49, 50 |
+
+ If you receive no response or garbled data with above ids, connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
 
 ## Dependencies
 
