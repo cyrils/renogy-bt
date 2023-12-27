@@ -55,7 +55,7 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 
 |  | Stand-alone | Daisy-chained | Hub mode |
 | :-------- | :-------- | :-------- | :-------- |
-|  Controller | 255 | ? | 97 |
+|  Controller | 255, 17 | 17 | 97 |
 |  Battery | 255 | 33, 34, 35 | 48, 49, 50 |
 
  If you receive no response or garbled data with above ids, connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
@@ -115,7 +115,7 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Device | Adapter | Tested |
 | -------- | :--------: | :--------: |
 | Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
-| Renogy Rover Elite | BT-2 |  ✅ |
+| Renogy Rover Elite RCC40RVRE | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
 | Renogy Battery RBT50LFP48S | BT-2 | ❓ |
