@@ -1,4 +1,3 @@
-import logging
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int, format_temperature
 
