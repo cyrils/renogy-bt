@@ -49,7 +49,7 @@ DEBUG:root:BT-TH-30A3XXXX => {'function': 'READ', 'daily_power_generation': [175
 DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'cell_count': 4, 'cell_voltage_0': 3.6, 'cell_voltage_1': 3.6, 'cell_voltage_2': 3.6, 'cell_voltage_3': 3.6, 'sensor_count': 4, 'temperature_0': 21.0, 'temperature_1': 21.0, 'temperature_2': 21.0, 'temperature_3': 21.0, 'current': 1.4, 'voltage': 14.5, 'remaining_charge': 99.941, 'capacity': 100.0, 'device_id': 48} 
 ```
 ```
-# Inverter output (Experimental)
+# Inverter output (experimental)
 DEBUG:root:BT-TH-F26EXXXX => {'function': 'READ', 'uei_voltage': 123.9, 'uei_current': 0, 'voltage': 120.0, 'load_current': 2, 'frequency': 60.01, 'temperature': 54.0, 'model': 'RIV4835CSH1S', 'solar_voltage': 93.9, 'solar_current': 0.3, 'solar_power': 32, 'solar_charging_state': 'mppt', 'solar_charging_power': 32, 'load_power': 23, 'charging_current': 0, 'battery_type': 'lithium', '__device': 'BT-TH-F26EXXXX', '__client': 'InverterClient'} 
 ```
 
@@ -122,7 +122,7 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy Rover Elite RCC40RVRE | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
-| Renogy Inverter RIV4835CSH1S| BT-2 | ❓ |
+| Renogy Inverter RIV4835CSH1S| BT-2 | 🚧 |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
 | SRNE ML24/ML48 Series | BT-1 | ❓ |
 
