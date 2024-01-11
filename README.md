@@ -1,7 +1,7 @@
 # Renogy BT
 ![256924763-940c205e-738d-4a68-982f-1695c80bfed5](https://github.com/cyrils/renogy-bt/assets/5549113/bcdef6ec-efc9-44fd-af70-67165cf6862e)
 
-Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using RS232 type [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or RS485 type [BT-2](https://www.renogy.com/bt-2-bluetooth-module/)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See a complete list of [compatible devices](#compatibility). It can log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
+Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using  [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) type (RS232 or RS485)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See a complete list of [compatible devices](#compatibility). It can log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
 
 ## Example
 Each device needs a separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) file. Update  config file with correct values for `mac_addr`, `alias` and `type` and run the following command:
@@ -122,9 +122,11 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy Rover Elite RCC40RVRE | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
-| Renogy Inverter RIV4835CSH1S| BT-2 | 🚧 |
+| Renogy Inverter RIV4835CSH1S*| BT-2 | 🚧 |
+| SRNE ML24/ML48 Series | BT-1 | ✅ |
 | RICH SOLAR 20/40/60 | BT-1 | ❓ |
-| SRNE ML24/ML48 Series | BT-1 | ❓ |
+
+*_Experimental support for inverter, not all fields are validated._
 
 ### Disclaimer
 

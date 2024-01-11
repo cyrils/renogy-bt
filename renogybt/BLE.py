@@ -26,7 +26,7 @@ class DeviceManager(gatt.DeviceManager):
             time.sleep(1)
             logging.info("Devices found: %s", len(self.devices()))
             for dev in self.devices():
-                if dev.mac_address != None and (dev.mac_address.upper() == mac_address or dev.alias() == self.device_alias) and discovering:
+                if dev.mac_address != None and (dev.mac_address.upper() == mac_address or dev.alias().strip() == self.device_alias) and discovering:
                     logging.info("Found matching device %s => [%s]", dev.alias(), dev.mac_address)
                     discovering = False; self.device_found = True
             wait = wait -1
