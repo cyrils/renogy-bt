@@ -1,7 +1,7 @@
 # Renogy BT
 ![256924763-940c205e-738d-4a68-982f-1695c80bfed5](https://github.com/cyrils/renogy-bt/assets/5549113/bcdef6ec-efc9-44fd-af70-67165cf6862e)
 
-Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using  [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) type (RS232 or RS485)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See a complete list of [compatible devices](#compatibility). It can log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
+Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using  [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) type (RS232 or RS485)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers and **Raspberry Pi Zero 2 W**. It might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See the list of [compatible devices](#compatibility). It can log the data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
 
 ## Example
 Each device needs a separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) file. Update  config file with correct values for `mac_addr`, `alias` and `type` and run the following command:
@@ -41,7 +41,7 @@ DEBUG:root:BT-TH-B00FXXXX => {'function': 'READ', 'model': 'RNG-CTRL-WND10', 'ba
 INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 ```
 ```
-# Historical data (7 days summary)
+# Rover historical data (7 days summary)
 DEBUG:root:BT-TH-30A3XXXX => {'function': 'READ', 'daily_power_generation': [1754, 1907, 1899, 1804, 1841, 1630, 1344],'daily_charge_ah': [135, 147, 147, 139, 142, 125, 102], 'daily_max_power': [234, 344, 360, 335, 331, 307, 290]}
 ```
 ```
@@ -61,6 +61,7 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 | :-------- | :-------- | :-------- | :-------- |
 |  Controller | 255, 17 | 17 | 97 |
 |  Battery | 255 | 33, 34, 35 | 48, 49, 50 |
+|  Inverter | 255, 32 | ? | ? |
 
  If you receive no response or garbled data with above ids, connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
 
