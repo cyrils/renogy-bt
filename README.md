@@ -59,7 +59,7 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 
 |  | Stand-alone | Daisy-chained | Hub mode |
 | :-------- | :-------- | :-------- | :-------- |
-|  Controller | 255, 17 | 17 | 97 |
+|  Controller | 255, 17 | 17 | 96, 97 |
 |  Battery | 255 | 33, 34, 35 | 48, 49, 50 |
 |  Inverter | 255, 32 | ? | ? |
 
@@ -121,6 +121,7 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | -------- | :--------: | :--------: |
 | Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
 | Renogy Rover Elite RCC40RVRE | BT-2 |  ✅ |
+| Renogy DC-DC Charger DCC50S | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
 | Renogy Inverter RIV4835CSH1S*| BT-2 | 🚧 |
