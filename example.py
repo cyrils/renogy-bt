@@ -19,6 +19,7 @@ def on_data_received(client, data):
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=filtered_data)
     if config['mqtt'].getboolean('enabled'):
+        data_logger.create_mqtt(json_data=filtered_data)
         data_logger.log_mqtt(json_data=filtered_data)
     if config['pvoutput'].getboolean('enabled') and config['device']['type'] == 'RNG_CTRL':
         data_logger.log_pvoutput(json_data=filtered_data)
