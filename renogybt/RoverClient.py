@@ -80,28 +80,137 @@ class RoverClient(BaseClient):
 
     def parse_chargin_info(self, bs):
         data = {}
+
         temp_unit = self.config['data']['temperature_unit']
-        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['battery_percentage'] = bytes_to_int(bs, 3, 2)
-        data['battery_voltage'] = bytes_to_int(bs, 5, 2, scale = 0.1)
-        data['battery_current'] = bytes_to_int(bs, 7, 2, scale = 0.01)
-        data['battery_temperature'] = parse_temperature(bytes_to_int(bs, 10, 1), temp_unit)
-        data['controller_temperature'] = parse_temperature(bytes_to_int(bs, 9, 1), temp_unit)
-        data['load_status'] = LOAD_STATE.get(bytes_to_int(bs, 67, 1) >> 7)
-        data['load_voltage'] = bytes_to_int(bs, 11, 2, scale = 0.1)
-        data['load_current'] = bytes_to_int(bs, 13, 2, scale = 0.01)
-        data['load_power'] = bytes_to_int(bs, 15, 2)
-        data['pv_voltage'] = bytes_to_int(bs, 17, 2, scale = 0.1) 
-        data['pv_current'] = bytes_to_int(bs, 19, 2, scale = 0.01)
-        data['pv_power'] = bytes_to_int(bs, 21, 2)
-        data['max_charging_power_today'] = bytes_to_int(bs, 33, 2)
-        data['max_discharging_power_today'] = bytes_to_int(bs, 35, 2)
-        data['charging_amp_hours_today'] = bytes_to_int(bs, 37, 2)
-        data['discharging_amp_hours_today'] = bytes_to_int(bs, 39, 2)
-        data['power_generation_today'] = bytes_to_int(bs, 41, 2)
-        data['power_consumption_today'] = bytes_to_int(bs, 43, 2)
-        data['power_generation_total'] = bytes_to_int(bs, 59, 4)
-        data['charging_status'] = CHARGING_STATE.get(bytes_to_int(bs, 68, 1))
+
+        data['device_info'] = {}
+
+        data['device_info']['function']= {}
+        data['device_info']['function']['value'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
+        data['device_info']['function']['device_class'] = ""
+        data['device_info']['function']['unit_of_measurement'] = ""
+        data['device_info']['function']['icon'] = "mdi:desktop-classic"
+
+        data['device_info']['battery_percentage']= {}
+        data['device_info']['battery_percentage']['value'] = bytes_to_int(bs, 3, 2)
+        data['device_info']['battery_percentage']['device_class'] = "battery"
+        data['device_info']['battery_percentage']['unit_of_measurement'] = "%"
+        data['device_info']['battery_percentage']['icon'] = "mdi:battery-charging"
+
+        data['device_info']['battery_voltage']= {}
+        data['device_info']['battery_voltage']['value'] = bytes_to_int(bs, 5, 2, scale = 0.1)
+        data['device_info']['battery_voltage']['device_class'] = "voltage"
+        data['device_info']['battery_voltage']['unit_of_measurement'] = "V"
+        data['device_info']['battery_voltage']['icon'] = "mdi:sine-wave"
+
+        data['device_info']['battery_current']= {}
+        data['device_info']['battery_current']['value'] = bytes_to_int(bs, 7, 2, scale = 0.01)
+        data['device_info']['battery_current']['device_class'] = "current"
+        data['device_info']['battery_current']['unit_of_measurement'] = "A"
+        data['device_info']['battery_current']['icon'] = "mdi:current-ac"
+
+        data['device_info']['battery_temperature']= {}
+        data['device_info']['battery_temperature']['value'] = parse_temperature(bytes_to_int(bs, 10, 1), temp_unit)
+        data['device_info']['battery_temperature']['device_class'] = "temperature"
+        data['device_info']['battery_temperature']['unit_of_measurement'] = temp_unit
+        data['device_info']['battery_temperature']['icon'] = "mdi:temperature-celsius"
+
+        data['device_info']['controller_temperature']= {}
+        data['device_info']['controller_temperature']['value'] = parse_temperature(bytes_to_int(bs, 9, 1), temp_unit)
+        data['device_info']['controller_temperature']['device_class'] = "temperature"
+        data['device_info']['controller_temperature']['unit_of_measurement'] = temp_unit
+        data['device_info']['controller_temperature']['icon'] = "mdi:temperature-celsius"
+
+        data['device_info']['load_status']= {}
+        data['device_info']['load_status']['value'] = LOAD_STATE.get(bytes_to_int(bs, 67, 1) >> 7)
+        data['device_info']['load_status']['device_class'] = ""
+        data['device_info']['load_status']['unit_of_measurement'] = ""
+        data['device_info']['load_status']['icon'] = "mdi:power-plug-battery-outline"
+
+        data['device_info']['load_voltage']= {}
+        data['device_info']['load_voltage']['value'] = bytes_to_int(bs, 11, 2, scale = 0.1)
+        data['device_info']['load_voltage']['device_class'] = "voltage"
+        data['device_info']['load_voltage']['unit_of_measurement'] = "V"
+        data['device_info']['load_voltage']['icon'] = "mdi:sine-wave"
+
+        data['device_info']['load_current']= {}
+        data['device_info']['load_current']['value'] = bytes_to_int(bs, 13, 2, scale = 0.01)
+        data['device_info']['load_current']['device_class'] = "current"
+        data['device_info']['load_current']['unit_of_measurement'] = "A"
+        data['device_info']['load_current']['icon'] = "mdi:current-ac"
+
+        data['device_info']['load_power']= {}
+        data['device_info']['load_power']['value'] = bytes_to_int(bs, 15, 2)
+        data['device_info']['load_power']['device_class'] = "power"
+        data['device_info']['load_power']['unit_of_measurement'] = "W"
+        data['device_info']['load_power']['icon'] = "mdi:flash"
+
+        data['device_info']['pv_voltage']= {}
+        data['device_info']['pv_voltage']['value'] = bytes_to_int(bs, 17, 2, scale = 0.1) 
+        data['device_info']['pv_voltage']['device_class'] = "voltage"
+        data['device_info']['pv_voltage']['unit_of_measurement'] = "V"
+        data['device_info']['pv_voltage']['icon'] = "mdi:sine-wave"
+
+        data['device_info']['pv_current']= {}
+        data['device_info']['pv_current']['value'] = bytes_to_int(bs, 19, 2, scale = 0.01)
+        data['device_info']['pv_current']['device_class'] = "current"
+        data['device_info']['pv_current']['unit_of_measurement'] = "A"
+        data['device_info']['pv_current']['icon'] = "mdi:current-ac"
+
+        data['device_info']['pv_power']= {}
+        data['device_info']['pv_power']['value'] = bytes_to_int(bs, 21, 2)
+        data['device_info']['pv_power']['device_class'] = "power"
+        data['device_info']['pv_power']['unit_of_measurement'] = "W"
+        data['device_info']['pv_power']['icon'] = "mdi:flash"
+
+        data['device_info']['max_charging_power_today']= {}
+        data['device_info']['max_charging_power_today']['value'] = bytes_to_int(bs, 33, 2)
+        data['device_info']['max_charging_power_today']['device_class'] = "power"
+        data['device_info']['max_charging_power_today']['unit_of_measurement'] = "W"
+        data['device_info']['max_charging_power_today']['icon'] = "mdi:flash"
+
+        data['device_info']['max_discharging_power_today']= {}
+        data['device_info']['max_discharging_power_today']['value'] = bytes_to_int(bs, 35, 2)
+        data['device_info']['max_discharging_power_today']['device_class'] = "power"
+        data['device_info']['max_discharging_power_today']['unit_of_measurement'] = "W"
+        data['device_info']['max_discharging_power_today']['icon'] = "mdi:flash"
+
+        data['device_info']['charging_amp_hours_today']= {}
+        data['device_info']['charging_amp_hours_today']['value'] = bytes_to_int(bs, 37, 2)
+        data['device_info']['charging_amp_hours_today']['device_class'] = "current"
+        data['device_info']['charging_amp_hours_today']['unit_of_measurement'] = "A"
+        data['device_info']['charging_amp_hours_today']['icon'] = "mdi:current-ac"
+
+        data['device_info']['discharging_amp_hours_today']= {}
+        data['device_info']['discharging_amp_hours_today']['value'] = bytes_to_int(bs, 39, 2)
+        data['device_info']['discharging_amp_hours_today']['device_class'] = "current"
+        data['device_info']['discharging_amp_hours_today']['unit_of_measurement'] = "A"
+        data['device_info']['discharging_amp_hours_today']['icon'] = "mdi:current-ac"
+
+        data['device_info']['power_generation_today']= {}
+        data['device_info']['power_generation_today']['value'] = bytes_to_int(bs, 41, 2)
+        data['device_info']['power_generation_today']['device_class'] = "power"
+        data['device_info']['power_generation_today']['unit_of_measurement'] = "W"
+        data['device_info']['power_generation_today']['icon'] = "mdi:flash"
+
+        data['device_info']['power_consumption_today']= {}
+        data['device_info']['power_consumption_today']['value'] = bytes_to_int(bs, 43, 2)
+        data['device_info']['power_consumption_today']['device_class'] = "power"
+        data['device_info']['power_consumption_today']['unit_of_measurement'] = "W"
+        data['device_info']['power_consumption_today']['icon'] = "mdi:flash"
+
+        data['device_info']['power_generation_total']= {}
+        data['device_info']['power_generation_total']['value'] = bytes_to_int(bs, 59, 4)
+        data['device_info']['power_generation_total']['device_class'] = "power"
+        data['device_info']['power_generation_total']['unit_of_measurement'] = "W"
+        data['device_info']['power_generation_total']['icon'] = "mdi:flash"
+
+        data['device_info']['charging_status']= {}
+        data['device_info']['charging_status']['value'] = CHARGING_STATE.get(bytes_to_int(bs, 68, 1))
+        data['device_info']['charging_status']['device_class'] = ""
+        data['device_info']['charging_status']['unit_of_measurement'] = ""
+        data['device_info']['charging_status']['icon'] = "mdi:connection"
+
         self.data.update(data)
 
     def parse_battery_type(self, bs):
