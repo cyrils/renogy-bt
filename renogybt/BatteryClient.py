@@ -34,7 +34,7 @@ class BatteryClient(BaseClient):
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['sensor_count'] = bytes_to_int(bs, 3, 2)
         for i in range(0, data['sensor_count']):
-            celcius = bytes_to_int(bs, 5 + i*2, 2, scale = 0.1)
+            celcius = bytes_to_int(bs, 5 + i*2, 2, scale = 0.1, signed = True)
             data[f'temperature_{i}'] = format_temperature(celcius, self.config['data']['temperature_unit'])
         self.data.update(data)
 

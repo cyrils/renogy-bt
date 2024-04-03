@@ -126,7 +126,7 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
 | Renogy Inverter RIV4835CSH1S*| BT-2 | 🚧 |
 | SRNE ML24/ML48 Series | BT-1 | ✅ |
-| RICH SOLAR 20/40/60 | BT-1 | ❓ |
+| RICH SOLAR 20/40/60 | BT-1 | ✅ |
 
 *_Experimental support for inverter, not all fields are validated._
 
