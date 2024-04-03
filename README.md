@@ -71,7 +71,7 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 python3 -m pip install -r requirements.txt
 ```
 
-This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments.
+This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments. You can also checkout the new [bleak](https://github.com/cyrils/renogy-bt/pull/66) port which is cross-platform.
 
 ## Data logging
 
