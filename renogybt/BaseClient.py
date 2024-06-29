@@ -84,8 +84,7 @@ class BaseClient:
         logging.info("on_read_operation_complete")
         self.data['__device'] = self.config['device']['alias']
         self.data['__client'] = self.__class__.__name__
-        if self.on_data_callback is not None:
-            self.on_data_callback(self, self.data)
+        self.__safe_callback(self.on_data_callback, self.data)
 
     def on_read_timeout(self):
         logging.error("on_read_timeout => please check your device_id!")
@@ -126,11 +125,20 @@ class BaseClient:
 
     def __on_error(self, connectFailed = False, error = None):
         logging.error(f"Exception occured: {error}")
+        self.__safe_callback(self.on_error_callback, error)
         self.__stop_service() if connectFailed else self.disconnect()
 
     def __on_connect_fail(self, error):
         logging.error(f"Connection failed: {error}")
+        self.__safe_callback(self.on_error_callback, error)
         self.__stop_service()
+
+    def __safe_callback(self, calback, param):
+        if calback is not None:
+            try:
+                calback(self, param)
+            except Exception as e:
+                logging.error(f"__safe_callback => exception in callback! {e}")
 
     def __stop_service(self):
         if self.poll_timer is not None and self.poll_timer.is_alive():
