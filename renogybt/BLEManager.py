@@ -34,8 +34,8 @@ class BLEManager:
         try:
             await self.client.connect()
             logging.info(f"Client connection: {self.client.is_connected}")
-            if not self.client.is_connected: return logging.error("Unable to conect")
-            
+            if not self.client.is_connected: return logging.error("Unable to connect")
+
             for service in self.client.services:
                 for characteristic in service.characteristics:
                     if characteristic.uuid == self.notify_char_uuid:
