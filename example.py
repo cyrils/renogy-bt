@@ -29,6 +29,9 @@ def on_data_received(client, data):
 def on_error(client, error):
     logging.error(f"on_error: {error}")
 
+    errorTopic = config['mqtt']['topic_error']
+    data_logger.log_mqtt_bytopic(errorTopic, error)
+
 # start client
 if config['device']['type'] == 'RNG_CTRL':
     RoverClient(config, on_data_received, on_error).connect()

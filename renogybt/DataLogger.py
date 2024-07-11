@@ -17,16 +17,23 @@ class DataLogger:
         logging.info("Log remote 200") if req.status_code == 200 else logging.error(f"Log remote error {req.status_code}")
 
     def log_mqtt(self, json_data):
-        logging.info(f"mqtt logging")
+        logging.info(f"mqtt logging to default topic")
+        self.log_mqtt_bytopic(self.config['mqtt']['topic'], payload=json.dumps(json_data))
+
+    def log_mqtt_bytopic(self, topic, payload):
+        logging.info("mqtt logging to topic {}".format(topic))
         user = self.config['mqtt']['user']
         password = self.config['mqtt']['password']
         auth = None if not user or not password else {"username": user, "password": password}
 
-        publish.single(
-            self.config['mqtt']['topic'], payload=json.dumps(json_data),
-            hostname=self.config['mqtt']['server'], port=self.config['mqtt'].getint('port'),
-            auth=auth, client_id="renogy-bt"
-        )
+        if topic == None:
+            logging.error("No topic was specified.")
+        else:
+            publish.single(
+                topic=topic, payload=payload,
+                hostname=self.config['mqtt']['server'], port=self.config['mqtt'].getint('port'),
+                auth=auth, client_id="renogy-bt"
+            )
 
     def log_pvoutput(self, json_data):
         date_time = datetime.now().strftime("d=%Y%m%d&t=%H:%M")
