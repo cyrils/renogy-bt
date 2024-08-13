@@ -63,7 +63,8 @@ class DataLogger:
 
     def log_pvoutput(self, json_data):
         date_time = datetime.now().strftime("d=%Y%m%d&t=%H:%M")
-        data = f"{date_time}&v1={json_data['power_generation_today']}&v2={json_data['pv_power']}&v3={json_data['power_consumption_today']}&v4={json_data['load_power']}&v5={json_data['controller_temperature']}>        response = requests.post(PVOUTPUT_URL, data=data, headers={
+        data = f"{date_time}&v1={json_data['power_generation_today']}&v2={json_data['pv_power']}&v3={json_data['power_consumption_today']}&v4={json_data['load_power']}&v5={json_data['controller_temperature']}&v6={json_data['battery_voltage']}"
+        response = requests.post(PVOUTPUT_URL, data=data, headers={
             "Content-Type": "application/x-www-form-urlencoded",
             "X-Pvoutput-Apikey": self.config['pvoutput']['api_key'],
             "X-Pvoutput-SystemId":  self.config['pvoutput']['system_id']
