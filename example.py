@@ -1,11 +1,10 @@
-import asyncio
 import logging
 import configparser
 import os
 import sys
 from renogybt import InverterClient, RoverClient, RoverHistoryClient, BatteryClient, DataLogger, Utils
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 config_file = sys.argv[1] if len(sys.argv) > 1 else 'config.ini'
 config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), config_file)
@@ -16,7 +15,7 @@ data_logger: DataLogger = DataLogger(config)
 # the callback func when you receive data
 def on_data_received(client, data):
     filtered_data = Utils.filter_fields(data, config['data']['fields'])
-    logging.info(f"{client.bleManager.device.name} => {filtered_data}")
+    logging.debug("{} => {}".format(client.device.alias(), filtered_data))
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=filtered_data)
     if config['mqtt'].getboolean('enabled'):
@@ -25,16 +24,16 @@ def on_data_received(client, data):
     if config['pvoutput'].getboolean('enabled') and config['device']['type'] == 'RNG_CTRL':
         data_logger.log_pvoutput(json_data=filtered_data)
     if not config['data'].getboolean('enable_polling'):
-        client.stop()
+        client.disconnect()
 
 # start client
 if config['device']['type'] == 'RNG_CTRL':
-    RoverClient(config, on_data_received).start()
+    RoverClient(config, on_data_received, on_error).connect()
 elif config['device']['type'] == 'RNG_CTRL_HIST':
-    RoverHistoryClient(config, on_data_received).start()
+    RoverHistoryClient(config, on_data_received, on_error).connect()
 elif config['device']['type'] == 'RNG_BATT':
-    BatteryClient(config, on_data_received).start()
+    BatteryClient(config, on_data_received, on_error).connect()
 elif config['device']['type'] == 'RNG_INVT':
-    InverterClient(config, on_data_received).start()
+    InverterClient(config, on_data_received, on_error).connect()
 else:
     logging.error("unknown device type")
