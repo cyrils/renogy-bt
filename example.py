@@ -26,6 +26,9 @@ def on_data_received(client, data):
     if not config['data'].getboolean('enable_polling'):
         client.disconnect()
 
+def on_error(client, error):
+    logging.error(f"on_error: {error}")
+
 # start client
 if config['device']['type'] == 'RNG_CTRL':
     RoverClient(config, on_data_received, on_error).connect()
