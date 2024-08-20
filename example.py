@@ -26,6 +26,7 @@ def on_data_received(client, data):
     if not config['data'].getboolean('enable_polling'):
         client.disconnect()
 
+# error callback
 def on_error(client, error):
     logging.error(f"on_error: {error}")
 
