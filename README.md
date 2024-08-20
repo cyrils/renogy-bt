@@ -61,9 +61,9 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 | :-------- | :-------- | :-------- | :-------- |
 |  Controller | 255, 17 | 17 | 96, 97 |
 |  Battery | 255 | 33, 34, 35 | 48, 49, 50 |
-|  Inverter | 255, 32 | ? | ? |
+|  Inverter | 255, 32 | 32 | 32 |
 
- If you receive no response or garbled data with above ids, connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
+ If you receive no response or garbled data with above ids, connect a single device to the Hub at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
 
 ## Dependencies
 
@@ -71,7 +71,7 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 python3 -m pip install -r requirements.txt
 ```
 
-This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments.
+This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments. You can also checkout the new [bleak](https://github.com/cyrils/renogy-bt/pull/66) port which is cross-platform.
 
 ## Data logging
 
@@ -124,6 +124,8 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy DC-DC Charger DCC50S | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
+| Renogy Battery RBT12100LFP-BT (Pro Series) | - | ❌ |
+| Renogy Smart Shunt | - | ❌ |
 | Renogy Inverter RIV4835CSH1S*| BT-2 | 🚧 |
 | SRNE ML24/ML48 Series | BT-1 | ✅ |
 | RICH SOLAR 20/40/60 | BT-1 | ✅ |

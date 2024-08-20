@@ -84,8 +84,7 @@ class BaseClient:
         logging.info("on_read_operation_complete")
         self.data['__device'] = self.config['device']['alias']
         self.data['__client'] = self.__class__.__name__
-        if self.on_data_callback is not None:
-            self.on_data_callback(self, self.data)
+        self.__safe_callback(self.on_data_callback, self.data)
 
     def on_read_timeout(self):
         logging.error("on_read_timeout => please check your device_id!")
