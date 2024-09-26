@@ -142,4 +142,5 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
  - [corbinbs/solarshed](https://github.com/corbinbs/solarshed)
  - [Rover 20A/40A Charge Controller—MODBUS Protocol](https://github.com/cyrils/renogy-bt/files/12787920/ROVER.MODBUS.pdf)
  - [Lithium Iron Battery BMS Modbus Protocol V1.7](https://github.com/cyrils/renogy-bt/files/12444500/Lithium.Iron.Battery.BMS.Modbus.Protocol.V1.7.zh-CN.en.1.pdf)
+ - Want to run this in ESPHome? [renogy-bt-esphome](//github.com/mavenius/renogy-bt-esphome) is a port of this project to do just that
 
