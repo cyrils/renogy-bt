@@ -117,14 +117,14 @@ $json_data = json_decode(file_get_contents('php://input'), true);
 If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may also register it as a [service](https://github.com/cyrils/renogy-bt/issues/77) for added reliability.
 
 ## Compatibility
-| Device | Adapter | Tested |
+| Device | Adapter | Supported |
 | -------- | :--------: | :--------: |
 | Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
 | Renogy Rover Elite RCC40RVRE | BT-2 |  ✅ |
 | Renogy DC-DC Charger DCC50S | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
-| Renogy Battery RBT12100LFP-BT (Pro Series) | - | ❓ |
+| Renogy Battery RBT12100LFP-BT (Pro Series) | - | [❓](https://github.com/cyrils/renogy-bt/issues/80) |
 | Renogy Inverter RIV4835CSH1S*| BT-2 | 🚧 |
 | Renogy Smart Shunt | - | ❌ |
 | SRNE ML24/ML48 Series | BT-1 | ✅ |
