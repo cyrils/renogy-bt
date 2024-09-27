@@ -114,7 +114,7 @@ $json_data = json_decode(file_get_contents('php://input'), true);
 ```sh
 */5 * * * * python3 /path/to/renogy-bt/example.py config.ini #runs every 5 mins
 ```
-If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may also register it as a [service](https://gist.github.com/emxsys/a507f3cad928e66f6410e7ac28e2990f) for added reliability.
+If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may also register it as a [service](https://github.com/cyrils/renogy-bt/issues/77) for added reliability.
 
 ## Compatibility
 | Device | Adapter | Tested |
@@ -124,9 +124,9 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy DC-DC Charger DCC50S | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
-| Renogy Battery RBT12100LFP-BT (Pro Series) | - | ❌ |
-| Renogy Smart Shunt | - | ❌ |
+| Renogy Battery RBT12100LFP-BT (Pro Series) | - | ❓ |
 | Renogy Inverter RIV4835CSH1S*| BT-2 | 🚧 |
+| Renogy Smart Shunt | - | ❌ |
 | SRNE ML24/ML48 Series | BT-1 | ✅ |
 | RICH SOLAR 20/40/60 | BT-1 | ✅ |
 
@@ -142,5 +142,5 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
  - [corbinbs/solarshed](https://github.com/corbinbs/solarshed)
  - [Rover 20A/40A Charge Controller—MODBUS Protocol](https://github.com/cyrils/renogy-bt/files/12787920/ROVER.MODBUS.pdf)
  - [Lithium Iron Battery BMS Modbus Protocol V1.7](https://github.com/cyrils/renogy-bt/files/12444500/Lithium.Iron.Battery.BMS.Modbus.Protocol.V1.7.zh-CN.en.1.pdf)
- - Want to run this in ESPHome? [renogy-bt-esphome](//github.com/mavenius/renogy-bt-esphome) is a port of this project to do just that
+ - [mavenius/renogy-bt-esphome](//github.com/mavenius/renogy-bt-esphome) - ESPHome port of this project
 
