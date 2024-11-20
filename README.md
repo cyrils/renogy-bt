@@ -124,7 +124,7 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
 | Renogy DC-DC Charger DCC50S | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
-| Renogy Battery RBT12100LFP-BT (Pro Series) | - | [❓](https://github.com/cyrils/renogy-bt/issues/80) |
+| Renogy Battery RBT12100LFP-BT / RBT12200LFP-BT (Pro Series) | - | ✅ |
 | Renogy Inverter RIV4835CSH1S*| BT-2 | 🚧 |
 | Renogy Smart Shunt | - | ❌ |
 | SRNE ML24/ML48 Series | BT-1 | ✅ |

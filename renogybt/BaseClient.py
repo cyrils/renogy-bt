@@ -11,6 +11,7 @@ from .BLE import DeviceManager, Device
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
 
 ALIAS_PREFIX = 'BT-TH'
+ALIAS_PREFIX_PRO = 'RNGRBP'
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
 READ_TIMEOUT = 30 # (seconds)
@@ -35,7 +36,7 @@ class BaseClient:
         if not self.manager.device_found:
             logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
             for dev in self.manager.devices():
-                if dev.alias() != None and dev.alias().startswith(ALIAS_PREFIX):
+                if dev.alias() != None and (dev.alias().startswith(ALIAS_PREFIX) or dev.alias().startswith(ALIAS_PREFIX_PRO)):
                     logging.debug(f"Possible device found! ======> {dev.alias()} > [{dev.mac_address}]")
             self.__stop_service()
 
