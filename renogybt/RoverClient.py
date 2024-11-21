@@ -66,7 +66,7 @@ class RoverClient(BaseClient):
     def set_load(self, value = 0):
         logging.info("setting load {}".format(value))
         request = self.create_generic_read_request(self.device_id, self.set_load_params["function"], self.set_load_params["register"], value)
-        self.bleManager.characteristic_write_value(request)
+        self.ble_manager.characteristic_write_value(request)
 
     def parse_device_info(self, bs):
         data = {}

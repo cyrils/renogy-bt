@@ -16,7 +16,7 @@ data_logger: DataLogger = DataLogger(config)
 # the callback func when you receive data
 def on_data_received(client, data):
     filtered_data = Utils.filter_fields(data, config['data']['fields'])
-    logging.info(f"{client.bleManager.device.name} => {filtered_data}")
+    logging.info(f"{client.ble_manager.device.name} => {filtered_data}")
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=filtered_data)
     if config['mqtt'].getboolean('enabled'):

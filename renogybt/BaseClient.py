@@ -1,6 +1,7 @@
 import asyncio
 import configparser
 import logging
+import traceback
 from .BLEManager import BLEManager
 from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 
@@ -17,7 +18,7 @@ READ_TIMEOUT = 15 # (seconds)
 class BaseClient:
     def __init__(self, config):
         self.config: configparser.ConfigParser = config
-        self.bleManager = None
+        self.ble_manager = None
         self.device = None
         self.poll_timer = None
         self.read_timeout = None
@@ -40,21 +41,21 @@ class BaseClient:
             self.__on_error("KeyboardInterrupt")
 
     async def connect(self):
-        self.bleManager = BLEManager(mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_uuid=NOTIFY_CHAR_UUID, write_uuid=WRITE_CHAR_UUID)
-        await self.bleManager.discover()
+        self.ble_manager = BLEManager(mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_uuid=NOTIFY_CHAR_UUID, write_uuid=WRITE_CHAR_UUID)
+        await self.ble_manager.discover()
 
-        if not self.bleManager.device:
+        if not self.ble_manager.device:
             logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
-            for dev in self.bleManager.discovered_devices:
+            for dev in self.ble_manager.discovered_devices:
                 if dev.name != None and (dev.name.startswith(ALIAS_PREFIX) or dev.name.startswith(ALIAS_PREFIX_PRO)):
                     logging.info(f"Possible device found! ====> {dev.name} > [{dev.address}]")
             self.stop()
         else:
-            await self.bleManager.connect()
-            if self.bleManager.client and self.bleManager.client.is_connected: await self.read_section()
+            await self.ble_manager.connect()
+            if self.ble_manager.client and self.ble_manager.client.is_connected: await self.read_section()
 
     async def disconnect(self):
-        await self.bleManager.disconnect()
+        await self.ble_manager.disconnect()
         self.future.set_result('DONE')
 
     async def on_data_received(self, response):
@@ -103,7 +104,7 @@ class BaseClient:
 
         self.read_timeout = self.loop.call_later(READ_TIMEOUT, self.on_read_timeout)
         request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words']) 
-        await self.bleManager.characteristic_write_value(request)
+        await self.ble_manager.characteristic_write_value(request)
 
     def create_generic_read_request(self, device_id, function, regAddr, readWrd):                             
         data = None                                
@@ -142,3 +143,4 @@ class BaseClient:
                 calback(self, param)
             except Exception as e:
                 logging.error(f"__safe_callback => exception in callback! {e}")
+                traceback.print_exc()
