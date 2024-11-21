@@ -1,10 +1,9 @@
-import os
-from threading import Timer
-import logging
+import asyncio
 import configparser
-import time
-from .Utils import bytes_to_int, int_to_bytes, crc16_modbus
-from .BLE import DeviceManager, Device
+import logging
+import traceback
+from .BLEManager import BLEManager
+from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 
 # Base class that works with all Renogy family devices
 # Should be extended by each client with its own parsers and section definitions
@@ -14,57 +13,61 @@ ALIAS_PREFIX = 'BT-TH'
 ALIAS_PREFIX_PRO = 'RNGRBP'
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
-READ_TIMEOUT = 30 # (seconds)
+READ_TIMEOUT = 15 # (seconds)
+READ_SUCCESS = 3
+READ_ERROR = 131
 
 class BaseClient:
     def __init__(self, config):
         self.config: configparser.ConfigParser = config
-        self.manager = None
+        self.ble_manager = None
         self.device = None
         self.poll_timer = None
-        self.read_timer = None
+        self.read_timeout = None
         self.data = {}
         self.device_id = self.config['device'].getint('device_id')
         self.sections = []
         self.section_index = 0
+        self.loop = None
         logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
 
-    def connect(self):
-        self.manager = DeviceManager(adapter_name=self.config['device']['adapter'], mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'])
-        self.manager.discover()
-
-        if not self.manager.device_found:
-            logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
-            for dev in self.manager.devices():
-                if dev.alias() != None and (dev.alias().startswith(ALIAS_PREFIX) or dev.alias().startswith(ALIAS_PREFIX_PRO)):
-                    logging.debug(f"Possible device found! ======> {dev.alias()} > [{dev.mac_address}]")
-            self.__stop_service()
-
-        self.device = Device(mac_address=self.config['device']['mac_addr'], manager=self.manager, on_resolved=self.__on_resolved, on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_uuid=NOTIFY_CHAR_UUID, write_uuid=WRITE_CHAR_UUID)
-
+    def start(self):
         try:
-            self.device.connect()
-            self.manager.run()
+            self.loop = asyncio.get_event_loop()
+            self.loop.create_task(self.connect())
+            self.future = self.loop.create_future()
+            self.loop.run_until_complete(self.future)
         except Exception as e:
-            self.__on_error(True, e)
+            self.__on_error(e)
         except KeyboardInterrupt:
-            self.__on_error(False, "KeyboardInterrupt")
+            self.__on_error("KeyboardInterrupt")
 
-    def disconnect(self):
-        self.device.disconnect()
-        self.__stop_service()
+    async def connect(self):
+        self.ble_manager = BLEManager(mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_uuid=NOTIFY_CHAR_UUID, write_uuid=WRITE_CHAR_UUID)
+        await self.ble_manager.discover()
 
-    def __on_resolved(self):
-        logging.info("resolved services")
-        self.poll_data() if self.config['data'].getboolean('enable_polling') == True else self.read_section()
+        if not self.ble_manager.device:
+            logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
+            for dev in self.ble_manager.discovered_devices:
+                if dev.name != None and (dev.name.startswith(ALIAS_PREFIX) or dev.name.startswith(ALIAS_PREFIX_PRO)):
+                    logging.info(f"Possible device found! ====> {dev.name} > [{dev.address}]")
+            self.stop()
+        else:
+            await self.ble_manager.connect()
+            if self.ble_manager.client and self.ble_manager.client.is_connected: await self.read_section()
 
-    def on_data_received(self, response):
-        self.read_timer.cancel()
+    async def disconnect(self):
+        await self.ble_manager.disconnect()
+        self.future.set_result('DONE')
+
+    async def on_data_received(self, response):
+        if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
         operation = bytes_to_int(response, 1, 1)
 
-        if operation == 3: # read operation
-            logging.info("on_data_received: response for read operation")
-            if (self.section_index < len(self.sections) and
+        if operation == READ_SUCCESS or operation == READ_ERROR:
+            logging.info(f"on_data_received: response for read operation")
+            if (operation == READ_SUCCESS and
+                self.section_index < len(self.sections) and
                 self.sections[self.section_index]['parser'] != None and
                 self.sections[self.section_index]['words'] * 2 + 5 == len(response)):
                 # parse and update data
@@ -74,12 +77,13 @@ class BaseClient:
                 self.section_index = 0
                 self.on_read_operation_complete()
                 self.data = {}
+                await self.check_polling()
             else:
                 self.section_index += 1
-                time.sleep(0.5)
-                self.read_section()
+                await asyncio.sleep(0.5)
+                await self.read_section()
         else:
-            logging.warn("on_data_received: unknown operation={}".format(operation))
+            logging.warning("on_data_received: unknown operation={}".format(operation))
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
@@ -88,24 +92,22 @@ class BaseClient:
         self.__safe_callback(self.on_data_callback, self.data)
 
     def on_read_timeout(self):
-        logging.error("on_read_timeout => please check your device_id!")
-        self.disconnect()
+        logging.error("on_read_timeout => Timed out! Please check your device_id!")
+        self.stop()
 
-    def poll_data(self):
-        self.read_section()
-        if self.poll_timer is not None and self.poll_timer.is_alive():
-            self.poll_timer.cancel()
-        self.poll_timer = Timer(self.config['data'].getint('poll_interval'), self.poll_data)
-        self.poll_timer.start()
+    async def check_polling(self):
+        if self.config['data'].getboolean('enable_polling'): 
+            await asyncio.sleep(self.config['data'].getint('poll_interval'))
+            await self.read_section()
 
-    def read_section(self):
+    async def read_section(self):
         index = self.section_index
         if self.device_id == None or len(self.sections) == 0:
-            return logging.error("base client cannot be used directly")
+            return logging.error("BaseClient cannot be used directly")
+
+        self.read_timeout = self.loop.call_later(READ_TIMEOUT, self.on_read_timeout)
         request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words']) 
-        self.device.characteristic_write_value(request)
-        self.read_timer = Timer(READ_TIMEOUT, self.on_read_timeout)
-        self.read_timer.start()
+        await self.ble_manager.characteristic_write_value(request)
 
     def create_generic_read_request(self, device_id, function, regAddr, readWrd):                             
         data = None                                
@@ -124,15 +126,19 @@ class BaseClient:
             logging.debug("{} {} => {}".format("create_request_payload", regAddr, data))
         return data
 
-    def __on_error(self, connectFailed = False, error = None):
+    def __on_error(self, error = None):
         logging.error(f"Exception occured: {error}")
         self.__safe_callback(self.on_error_callback, error)
-        self.__stop_service() if connectFailed else self.disconnect()
+        self.stop()
 
     def __on_connect_fail(self, error):
         logging.error(f"Connection failed: {error}")
         self.__safe_callback(self.on_error_callback, error)
-        self.__stop_service()
+        self.stop()
+
+    def stop(self):
+        if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
+        self.loop.create_task(self.disconnect())
 
     def __safe_callback(self, calback, param):
         if calback is not None:
@@ -140,10 +146,4 @@ class BaseClient:
                 calback(self, param)
             except Exception as e:
                 logging.error(f"__safe_callback => exception in callback! {e}")
-
-    def __stop_service(self):
-        if self.poll_timer is not None and self.poll_timer.is_alive():
-            self.poll_timer.cancel()
-        if self.poll_timer is not None: self.read_timer.cancel()
-        self.manager.stop()
-        os._exit(os.EX_OK)
+                traceback.print_exc()
