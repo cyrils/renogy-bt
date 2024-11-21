@@ -14,6 +14,8 @@ ALIAS_PREFIX_PRO = 'RNGRBP'
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
 READ_TIMEOUT = 15 # (seconds)
+READ_SUCCESS = 3
+READ_ERROR = 131
 
 class BaseClient:
     def __init__(self, config):
@@ -62,9 +64,10 @@ class BaseClient:
         if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
         operation = bytes_to_int(response, 1, 1)
 
-        if operation == 3: # read operation
+        if operation == READ_SUCCESS or operation == READ_ERROR:
             logging.info(f"on_data_received: response for read operation")
-            if (self.section_index < len(self.sections) and
+            if (operation == READ_SUCCESS and
+                self.section_index < len(self.sections) and
                 self.sections[self.section_index]['parser'] != None and
                 self.sections[self.section_index]['words'] * 2 + 5 == len(response)):
                 # parse and update data
@@ -80,7 +83,7 @@ class BaseClient:
                 await asyncio.sleep(0.5)
                 await self.read_section()
         else:
-            logging.warn("on_data_received: unknown operation={}".format(operation))
+            logging.warning("on_data_received: unknown operation={}".format(operation))
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
