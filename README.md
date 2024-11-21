@@ -61,9 +61,9 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 | :-------- | :-------- | :-------- | :-------- |
 |  Controller | 255, 17 | 17 | 96, 97 |
 |  Battery | 255 | 33, 34, 35 | 48, 49, 50 |
-|  Inverter | 255, 32 | ? | ? |
+|  Inverter | 255, 32 | 32 | 32 |
 
- If you receive no response or garbled data with above ids, connect a single device at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
+ If you receive no response or garbled data with above ids, connect a single device to the Hub at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
 
 ## Dependencies
 
@@ -71,7 +71,7 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 python3 -m pip install -r requirements.txt
 ```
 
-This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments.
+This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments. You can also checkout the new [bleak](https://github.com/cyrils/renogy-bt/pull/66) port which is cross-platform.
 
 ## Data logging
 
@@ -114,17 +114,19 @@ $json_data = json_decode(file_get_contents('php://input'), true);
 ```sh
 */5 * * * * python3 /path/to/renogy-bt/example.py config.ini #runs every 5 mins
 ```
-If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may also register it as a [service](https://gist.github.com/emxsys/a507f3cad928e66f6410e7ac28e2990f) for added reliability.
+If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may also register it as a [service](https://github.com/cyrils/renogy-bt/issues/77) for added reliability.
 
 ## Compatibility
-| Device | Adapter | Tested |
+| Device | Adapter | Supported |
 | -------- | :--------: | :--------: |
 | Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
 | Renogy Rover Elite RCC40RVRE | BT-2 |  ✅ |
 | Renogy DC-DC Charger DCC50S | BT-2 |  ✅ |
 | Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
 | Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
+| Renogy Battery RBT12100LFP-BT / RBT12200LFP-BT (Pro Series) | - | ✅ |
 | Renogy Inverter RIV4835CSH1S*| BT-2 | 🚧 |
+| Renogy Smart Shunt | - | ❌ |
 | SRNE ML24/ML48 Series | BT-1 | ✅ |
 | RICH SOLAR 20/40/60 | BT-1 | ✅ |
 
@@ -140,4 +142,5 @@ If you want to monitor real-time data, turn on polling in `config.ini` for conti
  - [corbinbs/solarshed](https://github.com/corbinbs/solarshed)
  - [Rover 20A/40A Charge Controller—MODBUS Protocol](https://github.com/cyrils/renogy-bt/files/12787920/ROVER.MODBUS.pdf)
  - [Lithium Iron Battery BMS Modbus Protocol V1.7](https://github.com/cyrils/renogy-bt/files/12444500/Lithium.Iron.Battery.BMS.Modbus.Protocol.V1.7.zh-CN.en.1.pdf)
+ - [mavenius/renogy-bt-esphome](//github.com/mavenius/renogy-bt-esphome) - ESPHome port of this project
 

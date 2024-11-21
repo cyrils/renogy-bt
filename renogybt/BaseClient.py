@@ -9,6 +9,7 @@ from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
 
 ALIAS_PREFIX = 'BT-TH'
+ALIAS_PREFIX_PRO = 'RNGRBP'
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
 READ_TIMEOUT = 15 # (seconds)
@@ -45,7 +46,7 @@ class BaseClient:
         if not self.bleManager.device:
             logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
             for dev in self.bleManager.discovered_devices:
-                if dev.name != None and dev.name.startswith(ALIAS_PREFIX):
+                if dev.name != None and (dev.name.startswith(ALIAS_PREFIX) or dev.name.startswith(ALIAS_PREFIX_PRO)):
                     logging.info(f"Possible device found! ====> {dev.name} > [{dev.address}]")
             self.stop()
         else:
@@ -84,8 +85,7 @@ class BaseClient:
         logging.info("on_read_operation_complete")
         self.data['__device'] = self.config['device']['alias']
         self.data['__client'] = self.__class__.__name__
-        if self.on_data_callback is not None:
-            self.on_data_callback(self, self.data)
+        self.__safe_callback(self.on_data_callback, self.data)
 
     def on_read_timeout(self):
         logging.error("on_read_timeout => Timed out! Please check your device_id!")
@@ -124,12 +124,21 @@ class BaseClient:
 
     def __on_error(self, error = None):
         logging.error(f"Exception occured: {error}")
+        self.__safe_callback(self.on_error_callback, error)
         self.stop()
 
     def __on_connect_fail(self, error):
         logging.error(f"Connection failed: {error}")
+        self.__safe_callback(self.on_error_callback, error)
         self.stop()
 
     def stop(self):
         if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
         self.loop.create_task(self.disconnect())
+
+    def __safe_callback(self, calback, param):
+        if calback is not None:
+            try:
+                calback(self, param)
+            except Exception as e:
+                logging.error(f"__safe_callback => exception in callback! {e}")

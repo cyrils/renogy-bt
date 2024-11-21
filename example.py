@@ -26,14 +26,18 @@ def on_data_received(client, data):
     if not config['data'].getboolean('enable_polling'):
         client.stop()
 
+# error callback
+def on_error(client, error):
+    logging.error(f"on_error: {error}")
+
 # start client
 if config['device']['type'] == 'RNG_CTRL':
-    RoverClient(config, on_data_received).start()
+    RoverClient(config, on_data_received, on_error).start()
 elif config['device']['type'] == 'RNG_CTRL_HIST':
-    RoverHistoryClient(config, on_data_received).start()
+    RoverHistoryClient(config, on_data_received, on_error).start()
 elif config['device']['type'] == 'RNG_BATT':
-    BatteryClient(config, on_data_received).start()
+    BatteryClient(config, on_data_received, on_error).start()
 elif config['device']['type'] == 'RNG_INVT':
-    InverterClient(config, on_data_received).start()
+    InverterClient(config, on_data_received, on_error).start()
 else:
     logging.error("unknown device type")
