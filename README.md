@@ -74,19 +74,19 @@ python3 -m pip install -r requirements.txt
 This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux/Windows/Mac platforms that supports [Bleak](https://github.com/hbldh/bleak). 
 
 ## Compatibility
-| Device | Adapter | Supported |
-| -------- | :--------: | :--------: |
-| Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
-| Renogy Rover Elite RCC40RVRE | BT-2 |  ✅ |
-| Renogy DC-DC Charger DCC50S | BT-2 |  ✅ |
-| Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
-| Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
-| Renogy Battery RBT12100LFP-BT / RBT12200LFP-BT (Pro Series) | - | ✅ |
-| Renogy Inverter RIV4835CSH1S| BT-2 | ✅ |
-| Renogy Inverter Rego RIV1230RCH (Built-in BLE) | - | ✅ |
-| Renogy Smart Shunt | - | ❌ |
-| SRNE ML24/ML48 Series | BT-1 | ✅ |
-| RICH SOLAR 20/40/60 | BT-1 | ✅ |
+| Device | Type | Adapter | Supported |
+| -------- | :-------- | :--------: | :--------: |
+| Renogy Rover/Wanderer/Adventurer | Controller |  BT-1 | ✅ |
+| Renogy Rover Elite RCC40RVRE | Controller | BT-2 |  ✅ |
+| Renogy DC-DC Charger DCC50S | Controller | BT-2 |  ✅ |
+| SRNE ML24/ML48 Series | Controller | BT-1 | ✅ |
+| RICH SOLAR 20/40/60 | Controller | BT-1 | ✅ |
+| Renogy RBT100LFP12S / RBT50LFP48S | Battery | BT-2 | ✅ |
+| Renogy RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE) | Battery | - | ✅ |
+| Renogy RBT12100LFP-BT / RBT12200LFP-BT (Pro Series) | Battery | - | ✅ |
+| Renogy RIV4835CSH1S | Inverter | BT-2 | ✅ |
+| Renogy Rego RIV1230RCH (Built-in BLE) | Inverter | - | ✅ |
+| Renogy Smart Shunt | Shunt | - | ❌ |
 
 ## Data logging
 
