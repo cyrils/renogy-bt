@@ -35,7 +35,7 @@ class InverterClient(BaseClient):
             {'register': 4000, 'words': 8, 'parser': self.parse_inverter_stats},
             {'register': 4311, 'words': 8, 'parser': self.parse_inverter_model},
             {'register': 4329, 'words': 5, 'parser': self.parse_solar_charging},
-            {'register': 4410, 'words': 2, 'parser': self.parse_battery_info}
+            {'register': 4410, 'words': 4, 'parser': self.parse_battery_info}
         ]
 
     def parse_inverter_stats(self, bs):
@@ -60,12 +60,12 @@ class InverterClient(BaseClient):
         data['solar_voltage'] = bytes_to_int(bs, 3, 2, scale=0.1)
         data['solar_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
         data['solar_power'] = bytes_to_int(bs, 7, 2)
-        data['solar_charging_state'] = CHARGING_STATE.get(bytes_to_int(bs, 9, 2))
+        data['charging_status'] = CHARGING_STATE.get(bytes_to_int(bs, 9, 2))
         data['charging_power'] = bytes_to_int(bs, 11, 2)
         self.data.update(data)
 
     def parse_battery_info(self, bs):
         data = {}
         data['load_power'] = bytes_to_int(bs, 3, 2)
-        data['charging_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
+        data['charging_current'] = bytes_to_int(bs, 7, 2, scale=0.01)
         self.data.update(data)
