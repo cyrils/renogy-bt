@@ -41,10 +41,10 @@ class InverterClient(BaseClient):
     def parse_inverter_stats(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['uei_voltage'] = bytes_to_int(bs, 3, 2, scale=0.1)
-        data['uei_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
-        data['inverter_voltage'] = bytes_to_int(bs, 7, 2, scale=0.1)
-        data['load_current'] = bytes_to_int(bs, 9, 2, scale=0.01)
+        data['input_voltage'] = bytes_to_int(bs, 3, 2, scale=0.1)
+        data['input_current'] = bytes_to_int(bs, 5, 2, scale=0.01)
+        data['output_voltage'] = bytes_to_int(bs, 7, 2, scale=0.1)
+        data['output_current'] = bytes_to_int(bs, 9, 2, scale=0.01)
         data['frequency'] = bytes_to_int(bs, 11, 2, scale=0.01)
         data['battery_voltage'] = bytes_to_int(bs, 13, 2, scale=0.1)
         data['temperature'] = bytes_to_int(bs, 15, 2, scale=0.1)
@@ -61,7 +61,7 @@ class InverterClient(BaseClient):
         data['solar_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
         data['solar_power'] = bytes_to_int(bs, 7, 2)
         data['solar_charging_state'] = CHARGING_STATE.get(bytes_to_int(bs, 9, 2))
-        data['solar_charging_power'] = bytes_to_int(bs, 11, 2)
+        data['charging_power'] = bytes_to_int(bs, 11, 2)
         self.data.update(data)
 
     def parse_battery_info(self, bs):
