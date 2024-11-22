@@ -35,30 +35,27 @@ class InverterClient(BaseClient):
             {'register': 4000, 'words': 8, 'parser': self.parse_inverter_stats},
             {'register': 4311, 'words': 8, 'parser': self.parse_inverter_model},
             {'register': 4329, 'words': 5, 'parser': self.parse_solar_charging},
-            {'register': 4410, 'words': 2, 'parser': self.parse_inverter_load},
-            {'register': 57348, 'words': 1, 'parser': self.parse_battery_type}
+            {'register': 4410, 'words': 2, 'parser': self.parse_battery_info}
         ]
 
     def parse_inverter_stats(self, bs):
-        logging.info(f"parse_inverter_stats {bs.hex()}")
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
         data['uei_voltage'] = bytes_to_int(bs, 3, 2, scale=0.1)
         data['uei_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
-        data['voltage'] = bytes_to_int(bs, 7, 2, scale=0.1)
-        data['load_current'] = bytes_to_int(bs, 9, 2)
+        data['inverter_voltage'] = bytes_to_int(bs, 7, 2, scale=0.1)
+        data['load_current'] = bytes_to_int(bs, 9, 2, scale=0.01)
         data['frequency'] = bytes_to_int(bs, 11, 2, scale=0.01)
-        data['temperature'] = bytes_to_int(bs, 13, 2, scale=0.1)
+        data['battery_voltage'] = bytes_to_int(bs, 13, 2, scale=0.1)
+        data['temperature'] = bytes_to_int(bs, 15, 2, scale=0.1)
         self.data.update(data)
 
     def parse_inverter_model(self, bs):
-        logging.info(f"parse_inverter_model {bs.hex()}")
         data = {}
         data['model'] = (bs[3:15]).decode('utf-8')
         self.data.update(data)
 
     def parse_solar_charging(self, bs):
-        logging.info(f"parse_solar_charging {bs.hex()}")
         data = {}
         data['solar_voltage'] = bytes_to_int(bs, 3, 2, scale=0.1)
         data['solar_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
@@ -67,15 +64,8 @@ class InverterClient(BaseClient):
         data['solar_charging_power'] = bytes_to_int(bs, 11, 2)
         self.data.update(data)
 
-    def parse_inverter_load(self, bs):
-        logging.info(f"parse_inverter_load {bs.hex()}")
+    def parse_battery_info(self, bs):
         data = {}
         data['load_power'] = bytes_to_int(bs, 3, 2)
         data['charging_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
-        self.data.update(data)
-
-    def parse_battery_type(self, bs):
-        data = {}
-        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['battery_type'] = BATTERY_TYPE.get(bytes_to_int(bs, 3, 2))
         self.data.update(data)

@@ -9,8 +9,7 @@ from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 # Should be extended by each client with its own parsers and section definitions
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
 
-ALIAS_PREFIX = 'BT-TH'
-ALIAS_PREFIX_PRO = 'RNGRBP'
+ALIAS_PREFIXES = ['BT-TH', 'RNGRBP', 'BTRIC']
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
 READ_TIMEOUT = 15 # (seconds)
@@ -49,7 +48,7 @@ class BaseClient:
         if not self.ble_manager.device:
             logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
             for dev in self.ble_manager.discovered_devices:
-                if dev.name != None and (dev.name.startswith(ALIAS_PREFIX) or dev.name.startswith(ALIAS_PREFIX_PRO)):
+                if dev.name != None and dev.name.startswith(tuple(ALIAS_PREFIXES)):
                     logging.info(f"Possible device found! ====> {dev.name} > [{dev.address}]")
             self.stop()
         else:
@@ -65,13 +64,15 @@ class BaseClient:
         operation = bytes_to_int(response, 1, 1)
 
         if operation == READ_SUCCESS or operation == READ_ERROR:
-            logging.info(f"on_data_received: response for read operation")
             if (operation == READ_SUCCESS and
                 self.section_index < len(self.sections) and
                 self.sections[self.section_index]['parser'] != None and
                 self.sections[self.section_index]['words'] * 2 + 5 == len(response)):
-                # parse and update data
+                # call the parser and update data
+                logging.info(f"on_data_received: read operation success")
                 self.sections[self.section_index]['parser'](response)
+            else:
+                logging.info(f"on_data_received: read operation failed: {response.hex()}")
 
             if self.section_index >= len(self.sections) - 1: # last section, read complete
                 self.section_index = 0

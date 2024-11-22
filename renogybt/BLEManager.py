@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import sys
 from bleak import BleakClient, BleakScanner, BLEDevice
 
 DISCOVERY_TIMEOUT = 5 # max wait time to complete the bluetooth scanning (seconds)
@@ -43,9 +44,9 @@ class BLEManager:
                         logging.info(f"subscribed to notification {characteristic.uuid}")
                     if characteristic.uuid == self.write_char_uuid:
                         logging.info(f"found write characteristic {characteristic.uuid}")
-        except Exception as e:
-            logging.error(f"Error connecting: {e}")
-            self.connect_fail_callback(e)
+        except Exception:
+            logging.error(f"Error connecting to device")
+            self.connect_fail_callback(sys.exc_info())
 
     async def notification_callback(self, characteristic, data: bytearray):
         logging.info("notification_callback")
