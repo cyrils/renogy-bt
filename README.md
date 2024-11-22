@@ -73,6 +73,21 @@ python3 -m pip install -r requirements.txt
 
 This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux/Windows/Mac platforms that supports [Bleak](https://github.com/hbldh/bleak). 
 
+## Compatibility
+| Device | Adapter | Supported |
+| -------- | :--------: | :--------: |
+| Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
+| Renogy Rover Elite RCC40RVRE | BT-2 |  ✅ |
+| Renogy DC-DC Charger DCC50S | BT-2 |  ✅ |
+| Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
+| Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
+| Renogy Battery RBT12100LFP-BT / RBT12200LFP-BT (Pro Series) | - | ✅ |
+| Renogy Inverter RIV4835CSH1S| BT-2 | ✅ |
+| Renogy Inverter Rego RIV1230RCH (Built-in BLE) | - | ✅ |
+| Renogy Smart Shunt | - | ❌ |
+| SRNE ML24/ML48 Series | BT-1 | ✅ |
+| RICH SOLAR 20/40/60 | BT-1 | ✅ |
+
 ## Data logging
 
 Supports logging data to local MQTT brokers like [Mosquitto](https://mosquitto.org/) or [Home Assistant](https://www.home-assistant.io/) dashboards. You can also log it to third party cloud services like [PVOutput](https://pvoutput.org/). See [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) for more details. Note that free PVOutput accounts have a cap of one request per minute.
@@ -115,22 +130,6 @@ $json_data = json_decode(file_get_contents('php://input'), true);
 */5 * * * * python3 /path/to/renogy-bt/example.py config.ini #runs every 5 mins
 ```
 If you want to monitor real-time data, turn on polling in `config.ini` for continues streaming (default interval is 60 secs). You may also register it as a [service](https://github.com/cyrils/renogy-bt/issues/77) for added reliability.
-
-## Compatibility
-| Device | Adapter | Supported |
-| -------- | :--------: | :--------: |
-| Renogy Rover/Wanderer/Adventurer | BT-1 | ✅ |
-| Renogy Rover Elite RCC40RVRE | BT-2 |  ✅ |
-| Renogy DC-DC Charger DCC50S | BT-2 |  ✅ |
-| Renogy Battery RBT100LFP12S / RBT50LFP48S | BT-2 | ✅ |
-| Renogy Battery RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE)| - | ✅ |
-| Renogy Battery RBT12100LFP-BT / RBT12200LFP-BT (Pro Series) | - | ✅ |
-| Renogy Inverter RIV4835CSH1S*| BT-2 | 🚧 |
-| Renogy Smart Shunt | - | ❌ |
-| SRNE ML24/ML48 Series | BT-1 | ✅ |
-| RICH SOLAR 20/40/60 | BT-1 | ✅ |
-
-*_Experimental support for inverter, not all fields are validated._
 
 ### Disclaimer
 
