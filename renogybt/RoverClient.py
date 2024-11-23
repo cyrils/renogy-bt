@@ -4,7 +4,6 @@ from .Utils import bytes_to_int, parse_temperature
 
 # Read and parse BT-1 RS232 type bluetooth module connected to Renogy Rover/Wanderer/Adventurer
 # series charge controllers. Also works with BT-2 RS485 module on Rover Elite, DC Charger etc.
-# Does not support Communication Hub with multiple devices connected
 
 FUNCTION = {
     3: "READ",
@@ -71,7 +70,7 @@ class RoverClient(BaseClient):
     def parse_device_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['model'] = (bs[3:17]).decode('utf-8').strip()
+        data['model'] = (bs[3:19]).decode('utf-8').strip()
         self.data.update(data)
 
     def parse_device_address(self, bs):

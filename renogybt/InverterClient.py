@@ -1,4 +1,3 @@
-import logging
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int
 
@@ -17,20 +16,12 @@ CHARGING_STATE = {
     6: 'current limiting'
 }
 
-BATTERY_TYPE = {
-    1: 'open',
-    2: 'sealed',
-    3: 'gel',
-    4: 'lithium',
-    5: 'custom'
-}
-
 class InverterClient(BaseClient):
     def __init__(self, config, on_data_callback=None, on_error_callback=None):
         super().__init__(config)
         self.on_data_callback = on_data_callback
         self.on_error_callback = on_error_callback
-        self.data = { 'function': 'READ' }
+        self.data = {}
         self.sections = [
             {'register': 4000, 'words': 8, 'parser': self.parse_inverter_stats},
             {'register': 4311, 'words': 8, 'parser': self.parse_inverter_model},
@@ -52,7 +43,7 @@ class InverterClient(BaseClient):
 
     def parse_inverter_model(self, bs):
         data = {}
-        data['model'] = (bs[3:15]).decode('utf-8')
+        data['model'] = (bs[3:19]).decode('utf-8')
         self.data.update(data)
 
     def parse_solar_charging(self, bs):
