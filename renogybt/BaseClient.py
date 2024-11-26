@@ -70,7 +70,7 @@ class BaseClient:
                 self.sections[self.section_index]['words'] * 2 + 5 == len(response)):
                 # call the parser and update data
                 logging.info(f"on_data_received: read operation success")
-                self.sections[self.section_index]['parser'](response)
+                self.__safe_parser(self.sections[self.section_index]['parser'], response)
             else:
                 logging.info(f"on_data_received: read operation failed: {response.hex()}")
 
@@ -147,4 +147,12 @@ class BaseClient:
                 calback(self, param)
             except Exception as e:
                 logging.error(f"__safe_callback => exception in callback! {e}")
+                traceback.print_exc()
+
+    def __safe_parser(self, parser, param):
+        if parser is not None:
+            try:
+                parser(param)
+            except Exception as e:
+                logging.error(f"exception in parser! {e}")
                 traceback.print_exc()
