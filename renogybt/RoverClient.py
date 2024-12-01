@@ -2,8 +2,7 @@ import logging
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int, parse_temperature
 
-# Read and parse BT-1 RS232 type bluetooth module connected to Renogy Rover/Wanderer/Adventurer
-# series charge controllers. Also works with BT-2 RS485 module on Rover Elite, DC Charger etc.
+# Read and parse BT-1/BT-2 type bluetooth modules connected to Renogy Rover/Wanderer/Adventurer
 
 FUNCTION = {
     3: "READ",

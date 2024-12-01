@@ -47,7 +47,7 @@ class InverterClient(BaseClient):
         self.data.update(data)
 
     def parse_inverter_model(self, bs):
-        data = { 'model': (bs[3:19]).decode('utf-8') }
+        data = { 'model': (bs[3:19]).decode('utf-8').rstrip('\x00') }
         self.data.update(data)
 
     def parse_charging_info(self, bs):

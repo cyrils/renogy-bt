@@ -51,7 +51,7 @@ class BatteryClient(BaseClient):
     def parse_device_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['model'] = (bs[3:19]).decode('utf-8')
+        data['model'] = (bs[3:19]).decode('utf-8').rstrip('\x00')
         self.data.update(data)
 
     def parse_device_address(self, bs):

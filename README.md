@@ -49,8 +49,8 @@ DEBUG:root:BT-TH-30A3XXXX => {'function': 'READ', 'daily_power_generation': [175
 DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'cell_count': 4, 'cell_voltage_0': 3.6, 'cell_voltage_1': 3.6, 'cell_voltage_2': 3.6, 'cell_voltage_3': 3.6, 'sensor_count': 4, 'temperature_0': 21.0, 'temperature_1': 21.0, 'temperature_2': 21.0, 'temperature_3': 21.0, 'current': 1.4, 'voltage': 14.5, 'remaining_charge': 99.941, 'capacity': 100.0, 'device_id': 48} 
 ```
 ```
-# Inverter output (experimental)
-DEBUG:root:BT-TH-F26EXXXX => {'function': 'READ', 'uei_voltage': 123.9, 'uei_current': 0, 'voltage': 120.0, 'load_current': 2, 'frequency': 60.01, 'temperature': 54.0, 'model': 'RIV4835CSH1S', 'solar_voltage': 93.9, 'solar_current': 0.3, 'solar_power': 32, 'solar_charging_state': 'mppt', 'solar_charging_power': 32, 'load_power': 23, 'charging_current': 0, 'battery_type': 'lithium', '__device': 'BT-TH-F26EXXXX', '__client': 'InverterClient'} 
+# Inverter output
+DEBUG:root:BTRIC13400XXXX => {'function': 'READ', 'input_voltage': 124.9, 'input_current': 2.2, 'output_voltage': 124.9, 'output_current': 1.19, 'output_frequency': 59.97, 'battery_voltage': 14.4, 'temperature': 30.0, 'input_frequency': 59.97, 'device_id': 32, 'model': 'RIV1230RCH-SPS', 'battery_percentage': 100, 'charging_current': 0.7, 'solar_voltage': 0.0, 'solar_current': 0.0, 'solar_power': 0, 'charging_status': 'deactivated', 'charging_power': 10, 'load_curent': 1.2, 'load_active_power': 108, 'load_apparent_power': 150, 'line_charging_current': 0.0, 'load_percentage': 5, '__device': 'BTRIC13400XXXX', '__client': 'InverterClient'}
 ```
 
 **Have multiple devices in Hub mode?**
