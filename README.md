@@ -59,7 +59,7 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 
 |  | Stand-alone | Daisy-chained | Hub mode |
 | :-------- | :-------- | :-------- | :-------- |
-|  Controller | 255, 17 | 17 | 96, 97 |
+|  Controller | 255, 17 | 16, 17 | 96, 97 |
 |  Battery | 255 | 33, 34, 35 | 48, 49, 50 |
 |  Inverter | 255, 32 | 32 | 32 |
 

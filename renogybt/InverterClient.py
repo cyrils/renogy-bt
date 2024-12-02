@@ -53,7 +53,7 @@ class InverterClient(BaseClient):
     def parse_charging_info(self, bs):
         data = {}
         data['battery_percentage'] = bytes_to_int(bs, 3, 2)
-        data['charging_current'] = bytes_to_int(bs, 5, 2, scale=0.1)
+        data['charging_current'] = bytes_to_int(bs, 5, 2, scale=0.1, signed=True)
         data['solar_voltage'] = bytes_to_int(bs, 7, 2, scale=0.1)
         data['solar_current'] = bytes_to_int(bs, 9, 2, scale=0.1)
         data['solar_power'] = bytes_to_int(bs, 11, 2)
