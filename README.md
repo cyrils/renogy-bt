@@ -16,7 +16,7 @@ RoverClient(config, on_data_received, on_error).start()
 ```
 **How to get mac address?**
 
-The library will automatically list possible compatible devices discovered nearby with alias starting `BT-TH`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
+The library will automatically list possible compatible devices discovered nearby, just run `example.py`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
 
 **Output**
 
@@ -66,7 +66,7 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
  If you receive no response or garbled data with above ids, connect a single device to the Hub at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
 
 ## Dependencies
-
+You will need [Python](https://www.python.org/downloads/) in your system. Then install dependencies by running the command:
 ```sh
 python3 -m pip install -r requirements.txt
 ```
