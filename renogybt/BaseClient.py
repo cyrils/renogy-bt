@@ -139,7 +139,10 @@ class BaseClient:
 
     def stop(self):
         if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
+        self.loop = asyncio.get_event_loop()
         self.loop.create_task(self.disconnect())
+        self.future = self.loop.create_future()
+        self.loop.run_until_complete(self.future)
 
     def __safe_callback(self, calback, param):
         if calback is not None:
