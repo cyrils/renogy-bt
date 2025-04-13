@@ -6,13 +6,15 @@ from bleak import BleakClient, BleakScanner, BLEDevice
 DISCOVERY_TIMEOUT = 5 # max wait time to complete the bluetooth scanning (seconds)
 
 class BLEManager:
-    def __init__(self, mac_address, alias, on_data, on_connect_fail, notify_uuid, write_uuid):
+    def __init__(self, mac_address, alias, on_data, on_connect_fail, write_service_uuid, notify_char_uuid, write_char_uuid):
         self.mac_address = mac_address
         self.device_alias = alias
         self.data_callback = on_data
         self.connect_fail_callback = on_connect_fail
-        self.notify_char_uuid = notify_uuid
-        self.write_char_uuid = write_uuid
+        self.write_service_uuid = write_service_uuid
+        self.notify_char_uuid = notify_char_uuid
+        self.write_char_uuid = write_char_uuid
+        self.write_char_handle = None
         self.device: BLEDevice = None
         self.client: BleakClient = None
         self.discovered_devices = []
@@ -42,8 +44,10 @@ class BLEManager:
                     if characteristic.uuid == self.notify_char_uuid:
                         await self.client.start_notify(characteristic,  self.notification_callback)
                         logging.info(f"subscribed to notification {characteristic.uuid}")
-                    if characteristic.uuid == self.write_char_uuid:
-                        logging.info(f"found write characteristic {characteristic.uuid}")
+                    if characteristic.uuid == self.write_char_uuid and service.uuid == self.write_service_uuid:
+                        self.write_char_handle = characteristic.handle
+                        logging.info(f"found write characteristic {characteristic.uuid}, service {service.uuid}")
+
         except Exception:
             logging.error(f"Error connecting to device")
             self.connect_fail_callback(sys.exc_info())
@@ -55,7 +59,7 @@ class BLEManager:
     async def characteristic_write_value(self, data):
         try:
             logging.info(f'writing to {self.write_char_uuid} {data}')
-            await self.client.write_gatt_char(self.write_char_uuid, bytearray(data))
+            await self.client.write_gatt_char(self.write_char_handle, bytearray(data), response=False)
             logging.info('characteristic_write_value succeeded')
             await asyncio.sleep(0.5)
         except Exception as e:
