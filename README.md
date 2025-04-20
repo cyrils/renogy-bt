@@ -1,7 +1,14 @@
 # Renogy BT
 ![256924763-940c205e-738d-4a68-982f-1695c80bfed5](https://github.com/cyrils/renogy-bt/assets/5549113/bcdef6ec-efc9-44fd-af70-67165cf6862e)
 
-Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using  [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) type (RS232 or RS485)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers, but it might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See the list of [compatible devices](#compatibility). It can also upload data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
+Cross-platform Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using  [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) type (RS232 or RS485)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers, but it might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See the list of [compatible devices](#compatibility). It can also upload data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
+
+## Dependencies
+You will need [Python](https://www.python.org/downloads/) in your system. In Raspberry Pi OS you may need to create python virtual environment. Then install dependencies by running the command:
+```sh
+python3 -m pip install -r requirements.txt
+```
+This library should work on any modern Linux/Windows/Mac platforms that supports [Bleak](https://github.com/hbldh/bleak). 
 
 ## Example
 Each device needs a separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) file. Update  config file with correct values for `mac_addr`, `alias` and `type` and run the following command:
@@ -64,14 +71,6 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 |  Inverter | 255, 32 | 32 | 32 |
 
  If you receive no response or garbled data with above ids, connect a single device to the Hub at a time and use the default broadcast address of 255 in `config.ini` to find out the actual `device_id` from output log. Then use this device Id to connect in Hub mode.
-
-## Dependencies
-You will need [Python](https://www.python.org/downloads/) in your system. Then install dependencies by running the command:
-```sh
-python3 -m pip install -r requirements.txt
-```
-
-This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux/Windows/Mac platforms that supports [Bleak](https://github.com/hbldh/bleak). 
 
 ## Compatibility
 | Device | Type | Adapter | Supported |
