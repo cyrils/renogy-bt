@@ -10,6 +10,7 @@ from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
 
 ALIAS_PREFIXES = ['BT-TH', 'RNGRBP', 'BTRIC']
+WRITE_SERVICE_UUID = "0000ffd0-0000-1000-8000-00805f9b34fb"
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
 READ_TIMEOUT = 15 # (seconds)
@@ -43,7 +44,7 @@ class BaseClient:
             self.__on_error("KeyboardInterrupt")
 
     async def connect(self):
-        self.ble_manager = BLEManager(mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_uuid=NOTIFY_CHAR_UUID, write_uuid=WRITE_CHAR_UUID)
+        self.ble_manager = BLEManager(mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_char_uuid=NOTIFY_CHAR_UUID, write_char_uuid=WRITE_CHAR_UUID, write_service_uuid=WRITE_SERVICE_UUID)
         await self.ble_manager.discover()
 
         if not self.ble_manager.device:
