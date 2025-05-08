@@ -4,7 +4,7 @@
 Cross-platform Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using  [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) type (RS232 or RS485)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers, but it might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See the list of [compatible devices](#compatibility). It can also upload data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
 
 ## Dependencies
-You will need [Python](https://www.python.org/downloads/) in your system. In Raspberry Pi OS you may need to create python virtual environment. Then install dependencies by running the command:
+You will need [Python](https://www.python.org/downloads/) 3.6 or above in your system. In some platforms you may have to create python virtual environment. Then install dependencies by running the command:
 ```sh
 python3 -m pip install -r requirements.txt
 ```
@@ -16,11 +16,7 @@ Each device needs a separate [config.ini](https://github.com/cyrils/renogy-bt1/b
 ```sh
 python3 ./example.py config.ini
 ```
- Alternatively, use it as a module with your own custom config and callback function:
-```python
-from renogybt import RoverClient
-RoverClient(config, on_data_received, on_error).start()
-```
+
 **How to get mac address?**
 
 The library will automatically list possible compatible devices discovered nearby, just run `example.py`. You can alternatively use apps like [BLE Scanner](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner).
