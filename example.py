@@ -38,7 +38,7 @@ elif config['device']['type'] == 'RNG_BATT':
     BatteryClient(config, on_data_received, on_error).start()
 elif config['device']['type'] == 'RNG_INVT':
     InverterClient(config, on_data_received, on_error).start()
-elif config['device']['type'] == 'RNG_DCCS':
+elif config['device']['type'] == 'RNG_DCC':
     DCChargerClient(config, on_data_received, on_error).start()
 else:
     logging.error("unknown device type")
