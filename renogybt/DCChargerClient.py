@@ -40,11 +40,6 @@ class DCChargerClient(BaseClient):
             {'register': 57348, 'words': 1, 'parser': self.parse_battery_type}
         ]
 
-    def on_write_operation_complete(self):
-        logging.info("on_write_operation_complete")
-        if self.on_data_callback is not None:
-            self.on_data_callback(self, self.data)
-
     def parse_device_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
@@ -83,7 +78,6 @@ class DCChargerClient(BaseClient):
         data['battery_ah_total_accumulated'] = bytes_to_int(bs, 51, 4)
         data['power_generation_total'] = bytes_to_int(bs, 59, 4)
         self.data.update(data)
-
 
     def parse_state(self, bs):
         data = {}
