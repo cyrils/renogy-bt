@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int, parse_temperature
@@ -64,7 +65,7 @@ class RoverClient(BaseClient):
     def set_load(self, value = 0):
         logging.info("setting load {}".format(value))
         request = self.create_generic_read_request(self.device_id, self.set_load_params["function"], self.set_load_params["register"], value)
-        self.ble_manager.characteristic_write_value(request)
+        asyncio.create_task(self.ble_manager.characteristic_write_value(request))
 
     def parse_device_info(self, bs):
         data = {}
