@@ -7,6 +7,10 @@ Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries usi
 Each device needs a separate [config.ini](https://github.com/cyrils/renogy-bt1/blob/main/config.ini) file. Update  config file with correct values for `mac_addr`, `alias` and `type` and run the following command:
 
 ```sh
+# Using uv (recommended)
+uv run python example.py config.ini
+
+# Or using python directly
 python3 ./example.py config.ini
 ```
  Alternatively, use it as a module with your own custom config and callback function:
@@ -67,11 +71,40 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 
 ## Dependencies
 
+### System Requirements
+
+This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments. You can also checkout the new [bleak](https://github.com/cyrils/renogy-bt/pull/66) port which is cross-platform.
+
+Before installing Python dependencies, install required system libraries:
+
+```sh
+# Debian/Ubuntu/Raspberry Pi OS
+sudo apt-get update
+sudo apt-get install -y python3-dev libdbus-1-dev libglib2.0-dev libcairo2-dev pkg-config
+```
+
+### Python Dependencies
+
+#### Using uv (Recommended)
+
+[uv](https://docs.astral.sh/uv/) is a fast Python package installer and resolver. Install it and sync dependencies:
+
+```sh
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Sync dependencies and create virtual environment
+uv sync
+
+# Run the example script
+uv run python example.py config.ini
+```
+
+#### Using pip (Traditional)
+
 ```sh
 python3 -m pip install -r requirements.txt
 ```
-
-This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments. You can also checkout the new [bleak](https://github.com/cyrils/renogy-bt/pull/66) port which is cross-platform.
 
 ## Data logging
 
