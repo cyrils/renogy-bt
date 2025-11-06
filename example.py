@@ -2,6 +2,7 @@ import logging
 import configparser
 import os
 import sys
+import threading
 from renogybt import InverterClient, RoverClient, RoverHistoryClient, BatteryClient, DataLogger, Utils
 
 logging.basicConfig(level=logging.DEBUG)
@@ -93,10 +94,25 @@ for section in device_sections:
         # Don't overwrite client.config which is already set by the constructor
         client.device_section = config[section]
         clients.append(client)
-        client.connect()
 
 if not clients:
     logging.error("No devices were initialized. Please check your configuration.")
     sys.exit(1)
 
 logging.info(f"Successfully initialized {len(clients)} device(s)")
+
+# Connect each client in a separate thread since each needs its own main loop
+threads = []
+for client in clients:
+    thread = threading.Thread(target=client.connect, daemon=True)
+    thread.start()
+    threads.append(thread)
+    logging.info(f"Started connection thread for {client.device.alias() if hasattr(client, 'device') and client.device else 'device'}")
+
+# Wait for all threads to complete (they run indefinitely until error or disconnect)
+try:
+    for thread in threads:
+        thread.join()
+except KeyboardInterrupt:
+    logging.info("Shutting down...")
+    sys.exit(0)
