@@ -75,36 +75,75 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 
 This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments. You can also checkout the new [bleak](https://github.com/cyrils/renogy-bt/pull/66) port which is cross-platform.
 
-Before installing Python dependencies, install required system libraries:
+### Installation
+
+#### Quick Setup (Recommended)
+
+Use the provided setup script for automated installation:
+
+```sh
+# Clone the repository
+git clone https://github.com/cyrils/renogy-bt.git
+cd renogy-bt
+
+# Run the setup script (installs system packages and Python dependencies)
+./setup.sh
+```
+
+The setup script will:
+1. Install required system packages (python3-dbus, python3-gi, python3-cairo, etc.)
+2. Install uv if not present
+3. Create a virtual environment with access to system packages
+4. Install Python dependencies
+
+#### Manual Installation
+
+If you prefer to install manually:
+
+**Step 1: Install System Packages**
+
+These packages contain C extensions that require system libraries and are best installed via the system package manager:
 
 ```sh
 # Debian/Ubuntu/Raspberry Pi OS
 sudo apt-get update
-sudo apt-get install -y python3-dev libdbus-1-dev libglib2.0-dev libcairo2-dev pkg-config
+sudo apt-get install -y \
+    python3-dev \
+    python3-dbus \
+    python3-gi \
+    python3-cairo \
+    libdbus-1-dev \
+    libglib2.0-dev \
+    libcairo2-dev \
+    pkg-config
 ```
 
-### Python Dependencies
+**Step 2: Install Python Dependencies**
 
-#### Using uv (Recommended)
-
-[uv](https://docs.astral.sh/uv/) is a fast Python package installer and resolver. Install it and sync dependencies:
+Using uv (recommended):
 
 ```sh
 # Install uv if not already installed
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Sync dependencies and create virtual environment
+# Create virtual environment with Python 3.12 and system site packages
+# (Python 3.12 is required to match the system-installed packages)
+uv venv --python 3.12 --system-site-packages
+
+# Sync Python dependencies
 uv sync
 
 # Run the example script
 uv run python example.py config.ini
 ```
 
-#### Using pip (Traditional)
+Using pip (traditional):
 
 ```sh
 python3 -m pip install -r requirements.txt
 ```
+
+**Why system packages?** The `dbus-python`, `PyGObject`, and `pycairo` packages have native C extensions that depend on system libraries. Installing them via your system package manager (apt) is more reliable than building from source.
 
 ## Data logging
 
