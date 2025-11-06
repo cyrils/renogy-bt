@@ -3,4 +3,5 @@ from .DataLogger import DataLogger
 from .BatteryClient import BatteryClient
 from .RoverHistoryClient import RoverHistoryClient
 from .InverterClient import InverterClient
+from .DCChargerClient import DCChargerClient
 from .Utils import *

@@ -1,7 +1,4 @@
-gatt
+bleak
 configparser
 requests
 paho-mqtt
-dbus-python
-pycairo 
-PyGObject

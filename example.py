@@ -5,7 +5,7 @@ import sys
 import threading
 from renogybt import InverterClient, RoverClient, RoverHistoryClient, BatteryClient, DataLogger, Utils
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 config_file = sys.argv[1] if len(sys.argv) > 1 else 'config.ini'
 config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), config_file)
@@ -16,7 +16,7 @@ data_logger: DataLogger = DataLogger(config)
 # the callback func when you receive data
 def on_data_received(client, data):
     filtered_data = Utils.filter_fields(data, config['data']['fields'])
-    logging.debug("{} => {}".format(client.device.alias(), filtered_data))
+    logging.info(f"{client.ble_manager.device.name} => {filtered_data}")
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=filtered_data)
     if config['mqtt'].getboolean('enabled'):
@@ -26,7 +26,7 @@ def on_data_received(client, data):
     if config['pvoutput'].getboolean('enabled') and device_type == 'RNG_CTRL':
         data_logger.log_pvoutput(json_data=filtered_data)
     if not config['data'].getboolean('enable_polling'):
-        client.disconnect()
+        client.stop()
 
 # error callback
 def on_error(client, error):

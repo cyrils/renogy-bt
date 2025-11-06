@@ -1,10 +1,9 @@
+import asyncio
 import logging
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int, parse_temperature
 
-# Read and parse BT-1 RS232 type bluetooth module connected to Renogy Rover/Wanderer/Adventurer
-# series charge controllers. Also works with BT-2 RS485 module on Rover Elite, DC Charger etc.
-# Does not support Communication Hub with multiple devices connected
+# Read and parse BT-1/BT-2 type bluetooth modules connected to Renogy Rover/Wanderer/Adventurer
 
 FUNCTION = {
     3: "READ",
@@ -48,7 +47,7 @@ class RoverClient(BaseClient):
         ]
         self.set_load_params = {'function': 6, 'register': 266}
 
-    def on_data_received(self, response):
+    async def on_data_received(self, response):
         operation = bytes_to_int(response, 1, 1)
         if operation == 6: # write operation
             self.parse_set_load_response(response)
@@ -56,7 +55,7 @@ class RoverClient(BaseClient):
             self.data = {}
         else:
             # read is handled in base class
-            super().on_data_received(response)
+            await super().on_data_received(response)
 
     def on_write_operation_complete(self):
         logging.info("on_write_operation_complete")
@@ -66,12 +65,12 @@ class RoverClient(BaseClient):
     def set_load(self, value = 0):
         logging.info("setting load {}".format(value))
         request = self.create_generic_read_request(self.device_id, self.set_load_params["function"], self.set_load_params["register"], value)
-        self.device.characteristic_write_value(request)
+        asyncio.create_task(self.ble_manager.characteristic_write_value(request))
 
     def parse_device_info(self, bs):
         data = {}
         data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['model'] = (bs[3:17]).decode('utf-8').strip()
+        data['model'] = (bs[3:19]).decode('utf-8').strip()
         self.data.update(data)
 
     def parse_device_address(self, bs):
