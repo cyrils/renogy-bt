@@ -3,7 +3,7 @@ name = "renogy-bt"
 version = "0.1.0"
 description = "Python library to read Renogy Solar Charge Controllers and Smart Batteries via Bluetooth"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
     { name = "Renogy BT Contributors" }
@@ -14,6 +14,9 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Operating System :: POSIX :: Linux",
     "Topic :: Home Automation",
@@ -42,8 +45,9 @@ build-backend = "hatchling.build"
 [tool.uv]
 dev-dependencies = []
 
-# Note: Create venv with --system-site-packages flag to access
-# system-installed packages (dbus-python, PyGObject, pycairo)
+# Note: Create venv with --system-site-packages flag and matching Python version
+# to access system-installed packages (dbus-python, PyGObject, pycairo)
+# Example: uv venv --python 3.11 --system-site-packages
 
 [tool.hatch.build.targets.wheel]
 packages = ["renogybt"]

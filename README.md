@@ -73,7 +73,9 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 
 ### System Requirements
 
-This library is primarily designed to work with Raspberry Pi OS, but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments. You can also checkout the new [bleak](https://github.com/cyrils/renogy-bt/pull/66) port which is cross-platform.
+This library is primarily designed to work with **Raspberry Pi OS** (tested on Raspberry Pi 4 and Zero 2 W), but should work on any modern Linux platforms. Due to incompatibility of underlying `gatt` library, this project is unsupported in Windows/Mac environments. You can also checkout the new [bleak](https://github.com/cyrils/renogy-bt/pull/66) port which is cross-platform.
+
+**Python Version**: Requires Python 3.9 or newer. The setup will automatically detect and use your system's Python version.
 
 ### Installation
 
@@ -126,9 +128,13 @@ Using uv (recommended):
 # Install uv if not already installed
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Create virtual environment with Python 3.12 and system site packages
-# (Python 3.12 is required to match the system-installed packages)
-uv venv --python 3.12 --system-site-packages
+# Check your system Python version
+python3 --version
+
+# Create virtual environment with your system Python version and system site packages
+# IMPORTANT: Use the same version as your system (e.g., 3.9, 3.11, etc.)
+# This ensures compatibility with system-installed packages
+uv venv --python 3.11 --system-site-packages  # Replace 3.11 with your version
 
 # Sync Python dependencies
 uv sync
@@ -144,6 +150,12 @@ python3 -m pip install -r requirements.txt
 ```
 
 **Why system packages?** The `dbus-python`, `PyGObject`, and `pycairo` packages have native C extensions that depend on system libraries. Installing them via your system package manager (apt) is more reliable than building from source.
+
+**Raspberry Pi Note**: The automated `setup.sh` script detects your system's Python version automatically and creates the virtual environment accordingly. Common Python versions on Raspberry Pi OS:
+- Raspberry Pi OS Bullseye: Python 3.9
+- Raspberry Pi OS Bookworm: Python 3.11
+
+The virtual environment must use the **same Python version** as your system to access the system-installed packages.
 
 ## Data logging
 

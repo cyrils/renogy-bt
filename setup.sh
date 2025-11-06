@@ -59,18 +59,20 @@ else
 fi
 
 echo ""
-echo "Step 3: Checking Python version..."
-if ! command -v python3.12 &> /dev/null; then
-    echo "Warning: Python 3.12 not found. The system packages are typically built for Python 3.12."
-    echo "Attempting to install Python 3.12..."
-    sudo apt-get install -y python3.12
-fi
-echo "✓ Python 3.12 is available"
+echo "Step 3: Detecting system Python version..."
+# Get the system's default python3 version
+SYSTEM_PYTHON=$(python3 --version 2>&1 | awk '{print $2}' | cut -d. -f1,2)
+SYSTEM_PYTHON_FULL=$(python3 --version 2>&1 | awk '{print $2}')
+echo "Detected system Python: $SYSTEM_PYTHON_FULL"
+echo "System packages (python3-dbus, python3-gi, python3-cairo) are built for Python $SYSTEM_PYTHON"
+echo "Using Python $SYSTEM_PYTHON for virtual environment to ensure compatibility"
+echo "✓ Python version detected"
 
 echo ""
 echo "Step 4: Creating virtual environment and installing Python dependencies..."
-# Create venv with Python 3.12 and system site packages access
-uv venv --python 3.12 --system-site-packages
+# Create venv with system Python version and system site packages access
+echo "Creating virtual environment with Python $SYSTEM_PYTHON and --system-site-packages..."
+uv venv --python $SYSTEM_PYTHON --system-site-packages
 uv sync
 echo "✓ Virtual environment created and dependencies installed"
 
