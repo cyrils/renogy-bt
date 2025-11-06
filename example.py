@@ -20,8 +20,8 @@ def on_data_received(client, data):
         data_logger.log_remote(json_data=filtered_data)
     if config['mqtt'].getboolean('enabled'):
         data_logger.log_mqtt(json_data=filtered_data)
-    # Check device type from the client's config section
-    device_type = client.config.get('type', '')
+    # Check device type from the client's device section
+    device_type = client.device_section.get('type', '') if hasattr(client, 'device_section') else client.config['device'].get('type', '')
     if config['pvoutput'].getboolean('enabled') and device_type == 'RNG_CTRL':
         data_logger.log_pvoutput(json_data=filtered_data)
     if not config['data'].getboolean('enable_polling'):
@@ -89,8 +89,9 @@ for section in device_sections:
         continue
 
     if client:
-        # Store reference to the config section for use in callbacks
-        client.config = config[section]
+        # Store reference to the device section for use in callbacks
+        # Don't overwrite client.config which is already set by the constructor
+        client.device_section = config[section]
         clients.append(client)
         client.connect()
 
