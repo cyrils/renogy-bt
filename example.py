@@ -62,14 +62,16 @@ for section in device_sections:
 
     # Copy the device section as 'device' for compatibility with client code
     device_config.add_section('device')
-    for key, value in config[section].items():
+    for key in config.options(section):
+        value = config.get(section, key)
         device_config.set('device', key, value)
 
     # Copy shared sections (data, remote_logging, mqtt, pvoutput)
     for shared_section in ['data', 'remote_logging', 'mqtt', 'pvoutput']:
         if config.has_section(shared_section):
             device_config.add_section(shared_section)
-            for key, value in config[shared_section].items():
+            for key in config.options(shared_section):
+                value = config.get(shared_section, key)
                 device_config.set(shared_section, key, value)
 
     # Create the appropriate client based on device type
