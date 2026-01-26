@@ -52,3 +52,79 @@ The following table summarizes the **changes made to the original code**:
 python3 example.py config.ini
 ```
 
+## Sample Output  :floppy_disk:
+
+```
+dexter:~/renogy-bt$ python3 example.py config.ini
+INFO:root:Init RoverClient: BT-TH-A58A7XYZ => CC:45:A5:XX:YY:ZZ
+INFO:root:Starting discovery...
+INFO:root:Devices found: 55
+INFO:root:Found matching device BT-TH-A58A7XYZ => CC:45:A5:XX:YY:ZZ
+INFO:root:Connecting (attempt 1)...
+WARNING:bleak.backends.bluezdbus.client:Failed to cancel connection (/org/bluez/hci0/dev_CC_45_A5_XX_YY_ZZ):
+WARNING:root:Connection attempt 1 failed: [org.bluez.Error.Failed] Disconnected early
+INFO:root:Connecting (attempt 2)...
+INFO:root:Client connection: True
+INFO:root:Found write characteristic 0000ffd1-0000-1000-8000-00805f9b34fb, service 0000ffd0-0000-1000-8000-00805f9b34fb
+INFO:root:Subscribed to notification 0000fff1-0000-1000-8000-00805f9b34fb
+INFO:root:BLE connection established successfully
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 0, 12, 0, 8, 145, 209]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 0, 26, 0, 1, 176, 19]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 1, 0, 0, 34, 209, 241]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 224, 4, 0, 1, 231, 213]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 240, 6, 0, 10, 3, 18]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Raw historical data: ff03140080008000000026000000040000000000000000685b
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 240, 5, 0, 10, 243, 18]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Raw historical data: ff031400840085000000250000000400000000000000008ff9
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 240, 4, 0, 10, 162, 210]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Raw historical data: ff03140084008400000025000000040000000000000000de69
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 240, 3, 0, 10, 19, 19]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Raw historical data: ff031400830084000000250000000400000000000000006b1d
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 240, 2, 0, 10, 66, 211]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Raw historical data: ff0314008d008f000000220000000400000000000000007d81
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 240, 1, 0, 10, 178, 211]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Raw historical data: ff0314008600860000002500000004000000000000000006b1
+INFO:root:Writing to 0000ffd1-0000-1000-8000-00805f9b34fb: [255, 3, 240, 0, 0, 10, 227, 19]
+INFO:root:Characteristic write succeeded
+INFO:root:notification_callback
+INFO:root:on_data_received: read operation success
+INFO:root:Raw historical data: ff0314008500860000002500000004000000140000010af361
+INFO:root:on_read_operation_complete
+INFO:root:BT-TH-A58A7XYZ => {'daily_power_generation Wh': [38, 37, 37, 37, 34, 37, 37], 'daily_charge Ah': [128, 133, 132, 132, 143, 134, 134], 'daily_max_power W': [38, 37, 37, 37, 34, 37, 37], 'battery_percentage': 100, 'battery_voltage V': 13.3, 'battery_current A': 0.0, 'battery_temperature C': 22, 'controller_temperature C': 23, 'load_status': 'on', 'load_voltage V': 13.3, 'load_current A': 0.28, 'load_power W': 3, 'solarpv_voltage V': 0.0, 'solarpv_current A': 0.0, 'solarpv_power W': 0, 'max_charging_power_today W': 0, 'max_discharging_power_today W': 4, 'charging_amp_hours_today Ah': 0, 'discharging_amp_hours_today Ah': 20, 'power_generation_today Wh': 0, 'power_consumption_today Wh': 266, 'power_generation_total Wh': 0, 'charging_status': 'deactivated'}
+{"daily_power_generation Wh": [38, 37, 37, 37, 34, 37, 37], "daily_charge Ah": [128, 133, 132, 132, 143, 134, 134], "daily_max_power W": [38, 37, 37, 37, 34, 37, 37], "battery_percentage": 100, "battery_voltage V": 13.3, "battery_current A": 0.0, "battery_temperature C": 22, "controller_temperature C": 23, "load_status": "on", "load_voltage V": 13.3, "load_current A": 0.28, "load_power W": 3, "solarpv_voltage V": 0.0, "solarpv_current A": 0.0, "solarpv_power W": 0, "max_charging_power_today W": 0, "max_discharging_power_today W": 4, "charging_amp_hours_today Ah": 0, "discharging_amp_hours_today Ah": 20, "power_generation_today Wh": 0, "power_consumption_today Wh": 266, "power_generation_total Wh": 0, "charging_status": "deactivated"}
+INFO:root:Disconnecting device: BT-TH-A58A7XYZ CC:45:A5:XX:YY:ZZ
+
+```
+
+
+
