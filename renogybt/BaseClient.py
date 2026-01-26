@@ -1,3 +1,5 @@
+#This is the updated code to accomodate issues if Bluetooth is turned OFF 
+
 import asyncio
 import configparser
 import logging
@@ -8,12 +10,11 @@ from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 # Base class that works with all Renogy family devices
 # Should be extended by each client with its own parsers and section definitions
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
-
 ALIAS_PREFIXES = ['BT-TH', 'RNGRBP', 'BTRIC']
 WRITE_SERVICE_UUID = "0000ffd0-0000-1000-8000-00805f9b34fb"
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
-READ_TIMEOUT = 15 # (seconds)
+READ_TIMEOUT = 15 # seconds
 READ_SUCCESS = 3
 READ_ERROR = 131
 
@@ -29,6 +30,7 @@ class BaseClient:
         self.sections = []
         self.section_index = 0
         self.loop = None
+        self.future = None
         logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
 
     def start(self):
@@ -44,25 +46,51 @@ class BaseClient:
             self.__on_error("KeyboardInterrupt")
 
     async def connect(self):
-        self.ble_manager = BLEManager(mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_char_uuid=NOTIFY_CHAR_UUID, write_char_uuid=WRITE_CHAR_UUID, write_service_uuid=WRITE_SERVICE_UUID)
-        await self.ble_manager.discover()
+        try:
+            self.ble_manager = BLEManager(
+                mac_address=self.config['device']['mac_addr'],
+                alias=self.config['device']['alias'],
+                on_data=self.on_data_received,
+                on_connect_fail=self.__on_connect_fail,
+                notify_char_uuid=NOTIFY_CHAR_UUID,
+                write_char_uuid=WRITE_CHAR_UUID,
+                write_service_uuid=WRITE_SERVICE_UUID
+            )
 
-        if not self.ble_manager.device:
-            logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
-            for dev in self.ble_manager.discovered_devices:
-                if dev.name != None and dev.name.startswith(tuple(ALIAS_PREFIXES)):
-                    logging.info(f"Possible device found! ====> {dev.name} > [{dev.address}]")
-            self.stop()
-        else:
+            # Try discovering devices
+            await self.ble_manager.discover()
+
+            if not self.ble_manager.device:
+                logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
+                for dev in self.ble_manager.discovered_devices:
+                    if dev.name and dev.name.startswith(tuple(ALIAS_PREFIXES)):
+                        logging.info(f"Possible device found! ====> {dev.name} > [{dev.address}]") 
+                # Stop the client cleanly
+                self.stop()
+                if self.future and not self.future.done():
+                    self.future.set_result('NO_DEVICE')
+                return
+
+            # Attempt connection
             await self.ble_manager.connect()
-            if self.ble_manager.client and self.ble_manager.client.is_connected: await self.read_section()
+            if self.ble_manager.client and self.ble_manager.client.is_connected:
+                await self.read_section()
+
+        except Exception as e:
+            logging.error(f"Bluetooth error: {e}")
+            self.stop()
+            if self.future and not self.future.done():
+                self.future.set_result('ERROR')
 
     async def disconnect(self):
-        await self.ble_manager.disconnect()
-        self.future.set_result('DONE')
+        if self.ble_manager:
+            await self.ble_manager.disconnect()
+        if self.future and not self.future.done():
+            self.future.set_result('DISCONNECTED')
 
     async def on_data_received(self, response):
-        if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
+        if self.read_timeout and not self.read_timeout.cancelled():
+            self.read_timeout.cancel()
         operation = bytes_to_int(response, 1, 1)
 
         if operation == READ_SUCCESS or operation == READ_ERROR:
@@ -76,7 +104,7 @@ class BaseClient:
             else:
                 logging.info(f"on_data_received: read operation failed: {response.hex()}")
 
-            if self.section_index >= len(self.sections) - 1: # last section, read complete
+            if self.section_index >= len(self.sections) - 1: # last section
                 self.section_index = 0
                 self.on_read_operation_complete()
                 self.data = {}
@@ -90,8 +118,8 @@ class BaseClient:
 
     def on_read_operation_complete(self):
         logging.info("on_read_operation_complete")
-        self.data['__device'] = self.config['device']['alias']
-        self.data['__client'] = self.__class__.__name__
+#        self.data['__device'] = self.config['device']['alias']
+#        self.data['__client'] = self.__class__.__name__
         self.__safe_callback(self.on_data_callback, self.data)
 
     def on_read_timeout(self):
@@ -99,7 +127,7 @@ class BaseClient:
         self.stop()
 
     async def check_polling(self):
-        if self.config['data'].getboolean('enable_polling'): 
+        if self.config['data'].getboolean('enable_polling'):
             await asyncio.sleep(self.config['data'].getint('poll_interval'))
             await self.read_section()
 
@@ -109,11 +137,11 @@ class BaseClient:
             return logging.error("BaseClient cannot be used directly")
 
         self.read_timeout = self.loop.call_later(READ_TIMEOUT, self.on_read_timeout)
-        request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words']) 
+        request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words'])
         await self.ble_manager.characteristic_write_value(request)
 
-    def create_generic_read_request(self, device_id, function, regAddr, readWrd):                             
-        data = None                                
+    def create_generic_read_request(self, device_id, function, regAddr, readWrd):
+        data = None
         if regAddr != None and readWrd != None:
             data = []
             data.append(device_id)
@@ -140,14 +168,19 @@ class BaseClient:
         self.stop()
 
     def stop(self):
-        if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
+        if self.read_timeout and not self.read_timeout.cancelled():
+            self.read_timeout.cancel()
+
         if self.loop is None:
             self.loop = asyncio.get_event_loop()
-            self.loop.create_task(self.disconnect())
-            self.future = self.loop.create_future()
-            self.loop.run_until_complete(self.future)
-        else:
-            self.loop.create_task(self.disconnect())
+
+        async def _stop_async():
+            if self.ble_manager:
+                await self.ble_manager.disconnect()
+            if self.future and not self.future.done():
+                self.future.set_result('STOPPED')
+
+        asyncio.create_task(_stop_async())
 
     def __safe_callback(self, calback, param):
         if calback is not None:
