@@ -2,6 +2,7 @@ import logging
 import configparser
 import os
 import sys
+import json  # added for printing JSON
 from renogybt import DCChargerClient, InverterClient, RoverClient, RoverHistoryClient, BatteryClient, DataLogger, Utils
 
 logging.basicConfig(level=logging.INFO)
@@ -16,23 +17,32 @@ data_logger: DataLogger = DataLogger(config)
 def on_data_received(client, data):
     filtered_data = Utils.filter_fields(data, config['data']['fields'])
     logging.info(f"{client.ble_manager.device.name} => {filtered_data}")
+
+    # Original logging/publishing functionality
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=filtered_data)
     if config['mqtt'].getboolean('enabled'):
         data_logger.log_mqtt(json_data=filtered_data)
-    if config['pvoutput'].getboolean('enabled') and config['device']['type'] == 'RNG_CTRL':
+    if config['pvoutput'].getboolean('enabled') and config['device']['type'] == 'RNG_CTRL':    
         data_logger.log_pvoutput(json_data=filtered_data)
     if not config['data'].getboolean('enable_polling'):
         client.stop()
+
+    # New func: print JSON to stdout 
+    try:
+        print(json.dumps(filtered_data))
+        sys.stdout.flush()  # ensures it is seen immediately
+    except Exception as e:
+        logging.error(f"Failed to print JSON: {e}")
 
 # error callback
 def on_error(client, error):
     logging.error(f"on_error: {error}")
 
-# start client
+# start client based on device type
 if config['device']['type'] == 'RNG_CTRL':
     RoverClient(config, on_data_received, on_error).start()
-elif config['device']['type'] == 'RNG_CTRL_HIST':
+ elif config['device']['type'] == 'RNG_CTRL_HIST':
     RoverHistoryClient(config, on_data_received, on_error).start()
 elif config['device']['type'] == 'RNG_BATT':
     BatteryClient(config, on_data_received, on_error).start()
