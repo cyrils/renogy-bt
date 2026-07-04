@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import time
 from .BaseClient import BaseClient
@@ -12,46 +11,32 @@ class ShuntClient(BaseClient):
     def __init__(self, config, on_data_callback=None, on_error_callback=None):
         super().__init__(config)
 
-        self.G_NOTIFY_CHAR_UUID = "0000c411-0000-1000-8000-00805f9b34fb"
-        self.G_WRITE_SERVICE_UUID = ""
-        self.G_WRITE_CHAR_UUID = ""
-        self.G_READ_TIMEOUT = 30
+        self.NOTIFY_CHAR_UUID = "0000c411-0000-1000-8000-00805f9b34fb"
+        self.WRITE_SERVICE_UUID = ""
+        self.WRITE_CHAR_UUID = ""
+        self.READ_TIMEOUT = 30
 
-        self.throttle_timer_len = self.config['data'].getint('poll_interval')
-        self.throttle_timer = time.perf_counter() - self.throttle_timer_len - 1
         self.on_data_callback = on_data_callback
         self.on_error_callback = on_error_callback
         self.data = {}
-        self.sections = [
-            {'register': 256, 'words': 110, 'parser': self.parse_shunt_info}
-        ]
-        self.set_load_params = {'function': 6, 'register': 266}
+        self.throttle_timer_len = self.config['data'].getint('poll_interval')
+        self.throttle_timer = time.perf_counter() - self.throttle_timer_len - 1
 
     async def on_data_received(self, response):
         logger.info("ShuntClient.on_data_received")
         operation = bytes_to_int(response, 1, 1)
 
-        if not self.is_running or (time.perf_counter() - self.throttle_timer) <= self.throttle_timer_len:
+        if (time.perf_counter() - self.throttle_timer) <= self.throttle_timer_len:
             return
 
         self.throttle_timer = time.perf_counter()
 
-        if operation == SHUNT_READ_SUCCESS:
-            if (self.section_index < len(self.sections) and
-                self.sections[self.section_index]['parser'] is not None and
-                self.sections[self.section_index]['words'] == len(response)):
-                self.data = self.sections[self.section_index]['parser'](response)
-                self.on_read_operation_complete()
-                if self.discovery_timeout and not self.discovery_timeout.cancelled():
-                    self.discovery_timeout.cancel()
-            else:
-                logger.warning("Unexpected shunt payload: %s", response.hex())
-        else:
+        if operation != SHUNT_READ_SUCCESS:
             logger.info("Ignoring shunt notification with operation=%s", operation)
+            return
 
-    def set_load(self, value=0):
-        request = self.create_generic_read_request(self.device_id, self.set_load_params["function"], self.set_load_params["register"], value)
-        asyncio.create_task(self.ble_manager.characteristic_write_value(request))
+        self.data = self.parse_shunt_info(response)
+        self.on_read_operation_complete()
 
     def parse_shunt_info(self, bs):
         data = {}
