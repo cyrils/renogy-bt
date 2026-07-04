@@ -1,46 +1,26 @@
 import asyncio
 import time
 from logger_config import logger
-from .ShuntBaseClient import ShuntBaseClient
-from .Utils import bytes_to_int, parse_temperature, format_temperature
+from .BaseClient import BaseClient
+from .Utils import bytes_to_int, format_temperature
 
-# Read and parse Smart Shunt 300
+# Minimal support for Renogy Smart Shunt devices.
+# The shunt sends notify-based updates, so this client keeps the logic simple
+# and reuses the base BLE connection flow without introducing a second base class.
 
-FUNCTION = {
-    3: "READ",
-    6: "WRITE"
-}
+SHUNT_READ_SUCCESS = 87
 
-CHARGING_STATE = {
-    0: 'deactivated',
-    1: 'activated',
-    2: 'mppt',
-    3: 'equalizing',
-    4: 'boost',
-    5: 'floating',
-    6: 'current limiting'
-}
-
-LOAD_STATE = {
-  0: 'off',
-  1: 'on'
-}
-
-BATTERY_TYPE = {
-    1: 'open',
-    2: 'sealed',
-    3: 'gel',
-    4: 'lithium',
-    5: 'custom'
-}
-
-
-class ShuntClient(ShuntBaseClient):
+class ShuntClient(BaseClient):
     def __init__(self, config, on_data_callback=None, on_error_callback=None):
         super().__init__(config)
 
-        self.throttleTimerLen = self.config['data'].getint('poll_interval')
-        self.throttleTimer = time.perf_counter() - self.config['data'].getint('poll_interval') - 1
+        self.G_NOTIFY_CHAR_UUID = "0000c411-0000-1000-8000-00805f9b34fb"
+        self.G_WRITE_SERVICE_UUID = ""
+        self.G_WRITE_CHAR_UUID = ""
+        self.G_READ_TIMEOUT = 30
+
+        self.throttle_timer_len = self.config['data'].getint('poll_interval')
+        self.throttle_timer = time.perf_counter() - self.throttle_timer_len - 1
         self.on_data_callback = on_data_callback
         self.on_error_callback = on_error_callback
         self.data = {}
@@ -49,62 +29,41 @@ class ShuntClient(ShuntBaseClient):
         ]
         self.set_load_params = {'function': 6, 'register': 266}
 
-        #logger.info(f'ShuntClient.__init__ {self.G_NOTIFY_CHAR_UUID} {self.G_WRITE_SERVICE_UUID} {self.G_WRITE_CHAR_UUID} {self.G_READ_TIMEOUT}')
-
     async def on_data_received(self, response):
-        logger.info("on_data_receive")
+        logger.info("ShuntClient.on_data_received")
         operation = bytes_to_int(response, 1, 1)
-        # The Smart Shunt sends many data requests, so we need to check if the client is running 
-        if self.is_running and (time.perf_counter() - self.throttleTimer) > self.throttleTimerLen:  
-            logger.info(f'ShuntClient.on_data_received {operation} {self.is_running} {time.perf_counter() - self.throttleTimer}')
-            self.throttleTimer = time.perf_counter()
 
-            if operation == 6: # write operation
-                self.parse_set_load_response(response)
-                self.on_write_operation_complete()
-                self.data = {}
+        if not self.is_running or (time.perf_counter() - self.throttle_timer) <= self.throttle_timer_len:
+            return
+
+        self.throttle_timer = time.perf_counter()
+
+        if operation == SHUNT_READ_SUCCESS:
+            if (self.section_index < len(self.sections) and
+                self.sections[self.section_index]['parser'] is not None and
+                self.sections[self.section_index]['words'] == len(response)):
+                self.data = self.sections[self.section_index]['parser'](response)
+                self.on_read_operation_complete()
+                if self.discovery_timeout and not self.discovery_timeout.cancelled():
+                    self.discovery_timeout.cancel()
             else:
-                # read is handled in base class
-                await super().on_data_received(response)
+                logger.warning("Unexpected shunt payload: %s", response.hex())
+        else:
+            logger.info("Ignoring shunt notification with operation=%s", operation)
 
-    def on_write_operation_complete(self):
-        #logger.info("on_write_operation_complete")
-        if self.on_data_callback is not None:
-            self.on_data_callback(self, self.data, self.config)
-
-    def set_load(self, value = 0):
-        #logger.info("setting load {}".format(value))
+    def set_load(self, value=0):
         request = self.create_generic_read_request(self.device_id, self.set_load_params["function"], self.set_load_params["register"], value)
         asyncio.create_task(self.ble_manager.characteristic_write_value(request))
-
-    def parse_device_info(self, bs):
-        data = {}
-        data['function'] = FUNCTION.get(bytes_to_int(bs, 1, 1))
-        data['model'] = (bs[3:17]).decode('utf-8').strip()
-        self.data.update(data)
-
-    def parse_device_address(self, bs):
-        data = {}
-        data['device_id'] = bytes_to_int(bs, 4, 1)
-        self.data.update(data)
 
     def parse_shunt_info(self, bs):
         data = {}
         temp_unit = self.config['data']['temperature_unit']
-        data['main_battery_percent'] = bytes_to_int(bs, 34, 2, scale = 0.1) # 0xA6 (#1)
-        data['main_battery_voltage'] = bytes_to_int(bs, 25, 3, scale = 0.001) # 0xA6 (#1)
-        data['starter_battery_voltage'] = bytes_to_int(bs, 30, 2, scale = 0.001) # 0xA6 (#2)
-        data['charge_amps'] = bytes_to_int(bs, 21, 3, scale = 0.001, signed=True) # 0xA4 (#1)
+        data['main_battery_percent'] = bytes_to_int(bs, 34, 2, scale=0.1)
+        data['main_battery_voltage'] = bytes_to_int(bs, 25, 3, scale=0.001)
+        data['starter_battery_voltage'] = bytes_to_int(bs, 30, 2, scale=0.001)
+        data['charge_amps'] = bytes_to_int(bs, 21, 3, scale=0.001, signed=True)
         data['charge_watts'] = round((data['main_battery_voltage'] * data['charge_amps']), 2)
-        #data['temperature_1'] = 0.00 if bytes_to_int(bs, 67, 1) == 0 else bytes_to_int(bs, 66, 3, scale = 0.001) # 0xAD (#3)
-        data['battery_temperature'] = format_temperature(bytes_to_int(bs, 66, 2, scale = 0.1), temp_unit) # 0xAD (#3)
-        #data['temperature_2'] = 0.00 if bytes_to_int(bs, 71, 1) == 0 else bytes_to_int(bs, 70, 3, scale = 0.001) # 0xAD (#4)
-        # unknown values:
-        # - time_remaining
-        # - discharge_duration
-        # - consumed_amp_hours
-        self.data.update(data)
-        # logger.debug(msg=f"DATA: {self.data}")
-        logger.warning(f'parse_shunt_info bs hex => {bs.hex()}')
+        data['battery_temperature'] = format_temperature(bytes_to_int(bs, 66, 2, scale=0.1), temp_unit)
+        logger.debug("Shunt payload: %s", bs.hex())
         return data
-        
+
