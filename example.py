@@ -1,12 +1,10 @@
+import logging
 import configparser
 import os
 import sys
-from logger_config import logger
-from renogybt import ShuntClient, DCChargerClient, InverterClient, RoverClient, RoverHistoryClient, BatteryClient, DataLogger, Utils
+from renogybt import DCChargerClient, InverterClient, RoverClient, RoverHistoryClient, BatteryClient, ShuntClient, DataLogger, Utils
 
-# Configure the logger
-#logging.basicConfig(level=logging.INFO)
-
+logging.basicConfig(level=logging.INFO)
 
 config_file = sys.argv[1] if len(sys.argv) > 1 else 'config.ini'
 config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), config_file)
@@ -15,9 +13,9 @@ config.read(config_path)
 data_logger: DataLogger = DataLogger(config)
 
 # the callback func when you receive data
-def on_data_received(client, data, config):
+def on_data_received(client, data):
     filtered_data = Utils.filter_fields(data, config['data']['fields'])
-    logger.warning(f"{client.ble_manager.device.name} => {filtered_data}")
+    logging.info(f"{client.ble_manager.device.name} => {filtered_data}")
     if config['remote_logging'].getboolean('enabled'):
         data_logger.log_remote(json_data=filtered_data)
     if config['mqtt'].getboolean('enabled'):
@@ -28,8 +26,8 @@ def on_data_received(client, data, config):
         client.stop()
 
 # error callback
-def on_error(client, error, param2=None):  #added param2 to avoid error?
-    logger.error(f"on_error: {error}")
+def on_error(client, error):
+    logging.error(f"on_error: {error}")
 
 # start client
 if config['device']['type'] == 'RNG_CTRL':
@@ -45,4 +43,4 @@ elif config['device']['type'] == 'RNG_DCC':
 elif config['device']['type'] == 'RNG_SHNT':
     ShuntClient(config, on_data_received, on_error).start()
 else:
-    logger.error("unknown device type")
+    logging.error("unknown device type")

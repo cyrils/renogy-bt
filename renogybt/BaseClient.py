@@ -1,8 +1,7 @@
-import sys
 import asyncio
 import configparser
+import logging
 import traceback
-from logger_config import logger
 from .BLEManager import BLEManager
 from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 
@@ -10,45 +9,31 @@ from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 # Should be extended by each client with its own parsers and section definitions
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
 
-ALIAS_PREFIXES = ['BT-TH', 'RNGRBP', 'BTRIC', 'RTMShunt300', 'Shunt300', 'RNGRIU']
+ALIAS_PREFIXES = ['BT-TH', 'RNGRBP', 'BTRIC']
+WRITE_SERVICE_UUID = "0000ffd0-0000-1000-8000-00805f9b34fb"
+NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
+WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
+READ_TIMEOUT = 15 # (seconds)
 READ_SUCCESS = 3
 READ_ERROR = 131
 
 class BaseClient:
     def __init__(self, config):
-        # Moved into class to allow override by subclasses
-        self.G_WRITE_SERVICE_UUID = "0000ffd0-0000-1000-8000-00805f9b34fb"
-        self.G_NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
-        self.G_WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
-        self.G_READ_TIMEOUT = 15 # (seconds)
-        self.G_DISCOVERY_TIMEOUT = 45 # (seconds)
-
         self.config: configparser.ConfigParser = config
         self.ble_manager = None
         self.device = None
         self.poll_timer = None
         self.read_timeout = None
-        self.discovery_timeout = None
-        self.is_running = False # Used to signify if the client is currently running and can process data requests
         self.data = {}
         self.device_id = self.config['device'].getint('device_id')
         self.sections = []
         self.section_index = 0
         self.loop = None
-        logger.info(f"BaseClient.Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
+        logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
 
     def start(self):
         try:
-            if sys.version_info < (3, 10):
-                self.loop = asyncio.get_event_loop()
-            else:
-                try:
-                    self.loop = asyncio.get_running_loop()
-                except RuntimeError:
-                    self.loop = asyncio.new_event_loop()
-
-                asyncio.set_event_loop(self.loop)
-
+            self.loop = asyncio.get_event_loop()
             self.loop.create_task(self.connect())
             self.future = self.loop.create_future()
             self.loop.run_until_complete(self.future)
@@ -59,33 +44,25 @@ class BaseClient:
             self.__on_error("KeyboardInterrupt")
 
     async def connect(self):
-        logger.info(f'BaseClient.connect {self.G_NOTIFY_CHAR_UUID} {self.G_WRITE_SERVICE_UUID} {self.G_WRITE_CHAR_UUID} {self.G_READ_TIMEOUT}')
-        self.ble_manager = BLEManager(mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_char_uuid=self.G_NOTIFY_CHAR_UUID, write_char_uuid=self.G_WRITE_CHAR_UUID, write_service_uuid=self.G_WRITE_SERVICE_UUID)
-        self.discovery_timeout = self.loop.call_later(self.G_DISCOVERY_TIMEOUT, self.on_discovery_timeout)
+        self.ble_manager = BLEManager(mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_char_uuid=NOTIFY_CHAR_UUID, write_char_uuid=WRITE_CHAR_UUID, write_service_uuid=WRITE_SERVICE_UUID)
         await self.ble_manager.discover()
 
         if not self.ble_manager.device:
-            logger.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
+            logging.error(f"Device not found: {self.config['device']['alias']} => {self.config['device']['mac_addr']}, please check the details provided.")
             for dev in self.ble_manager.discovered_devices:
                 if dev.name != None and dev.name.startswith(tuple(ALIAS_PREFIXES)):
-                    logger.info(f"Possible device found! ====> {dev.name} > [{dev.address}]")
-                else:
-                    logger.info(f"Other Device found ====> {dev.name} > [{dev.address}]")
+                    logging.info(f"Possible device found! ====> {dev.name} > [{dev.address}]")
             self.stop()
         else:
-            self.is_running = True
             await self.ble_manager.connect()
             if self.ble_manager.client and self.ble_manager.client.is_connected: await self.read_section()
 
     async def disconnect(self):
-        self.is_running = False
         await self.ble_manager.disconnect()
         self.future.set_result('DONE')
 
     async def on_data_received(self, response):
-        logger.info(f"BaseClient.on_data_received: start")
         if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
-        if self.discovery_timeout and not self.discovery_timeout.cancelled(): self.discovery_timeout.cancel()
         operation = bytes_to_int(response, 1, 1)
 
         if operation == READ_SUCCESS or operation == READ_ERROR:
@@ -94,10 +71,10 @@ class BaseClient:
                 self.sections[self.section_index]['parser'] != None and
                 self.sections[self.section_index]['words'] * 2 + 5 == len(response)):
                 # call the parser and update data
-                logger.info(f"on_data_received: read operation success")
+                logging.info(f"on_data_received: read operation success")
                 self.__safe_parser(self.sections[self.section_index]['parser'], response)
             else:
-                logger.info(f"on_data_received: read operation failed: {response.hex()}")
+                logging.info(f"on_data_received: read operation failed: {response.hex()}")
 
             if self.section_index >= len(self.sections) - 1: # last section, read complete
                 self.section_index = 0
@@ -109,20 +86,16 @@ class BaseClient:
                 await asyncio.sleep(0.5)
                 await self.read_section()
         else:
-            logger.warning("on_data_received: unknown operation={}".format(operation))
+            logging.warning("on_data_received: unknown operation={}".format(operation))
 
     def on_read_operation_complete(self):
-        logger.info("on_read_operation_complete")
+        logging.info("on_read_operation_complete")
         self.data['__device'] = self.config['device']['alias']
         self.data['__client'] = self.__class__.__name__
-        self.__safe_callback(self.on_data_callback, self.data, self.config)
+        self.__safe_callback(self.on_data_callback, self.data)
 
     def on_read_timeout(self):
-        logger.error("on_read_timeout => Timed out! Please check your device_id!")
-        self.stop()
-
-    def on_discovery_timeout(self):
-        logger.error("on_discovery_timeout => Timed out! Bluetooth outage?")
+        logging.error("on_read_timeout => Timed out! Please check your device_id!")
         self.stop()
 
     async def check_polling(self):
@@ -133,10 +106,9 @@ class BaseClient:
     async def read_section(self):
         index = self.section_index
         if self.device_id == None or len(self.sections) == 0:
-            return logger.error("BaseClient cannot be used directly")
+            return logging.error("BaseClient cannot be used directly")
 
-        self.read_timeout = self.loop.call_later(self.G_READ_TIMEOUT, self.on_read_timeout)
-        logger.info("Started read timeout for {} seconds".format(self.G_READ_TIMEOUT))
+        self.read_timeout = self.loop.call_later(READ_TIMEOUT, self.on_read_timeout)
         request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words']) 
         await self.ble_manager.characteristic_write_value(request)
 
@@ -154,16 +126,16 @@ class BaseClient:
             crc = crc16_modbus(bytes(data))
             data.append(crc[0])
             data.append(crc[1])
-            logger.debug("{} {} => {}".format("create_request_payload", regAddr, data))
+            logging.debug("{} {} => {}".format("create_request_payload", regAddr, data))
         return data
 
     def __on_error(self, error = None):
-        logger.error(f"Exception occured: {error}")
+        logging.error(f"Exception occured: {error}")
         self.__safe_callback(self.on_error_callback, error)
         self.stop()
 
     def __on_connect_fail(self, error):
-        logger.error(f"Connection failed: {error}")
+        logging.error(f"Connection failed: {error}")
         self.__safe_callback(self.on_error_callback, error)
         self.stop()
 
@@ -177,17 +149,12 @@ class BaseClient:
         else:
             self.loop.create_task(self.disconnect())
 
-    def __safe_callback(self, calback, param, param2=None):
+    def __safe_callback(self, calback, param):
         if calback is not None:
             try:
-                if param2 is None:
-                    # If only one parameter is passed, call the callback with just that parameter
-                    calback(self, param)
-                else:
-                    # If two parameters are passed, call the callback with both
-                    calback(self, param, param2)
+                calback(self, param)
             except Exception as e:
-                logger.error(f"__safe_callback => exception in callback! {e}")
+                logging.error(f"__safe_callback => exception in callback! {e}")
                 traceback.print_exc()
 
     def __safe_parser(self, parser, param):
@@ -195,5 +162,5 @@ class BaseClient:
             try:
                 parser(param)
             except Exception as e:
-                logger.error(f"exception in parser! {e}")
+                logging.error(f"exception in parser! {e}")
                 traceback.print_exc()

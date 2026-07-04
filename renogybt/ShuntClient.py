@@ -1,14 +1,12 @@
 import asyncio
+import logging
 import time
-from logger_config import logger
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int, format_temperature
 
-# Minimal support for Renogy Smart Shunt devices.
-# The shunt sends notify-based updates, so this client keeps the logic simple
-# and reuses the base BLE connection flow without introducing a second base class.
-
+logger = logging.getLogger(__name__)
 SHUNT_READ_SUCCESS = 87
+
 
 class ShuntClient(BaseClient):
     def __init__(self, config, on_data_callback=None, on_error_callback=None):
@@ -66,4 +64,3 @@ class ShuntClient(BaseClient):
         data['battery_temperature'] = format_temperature(bytes_to_int(bs, 66, 2, scale=0.1), temp_unit)
         logger.debug("Shunt payload: %s", bs.hex())
         return data
-
