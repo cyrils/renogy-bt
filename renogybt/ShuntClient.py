@@ -6,6 +6,8 @@ from .Utils import bytes_to_int, format_temperature
 logger = logging.getLogger(__name__)
 SHUNT_READ_SUCCESS = 87
 
+# Shunt Client is purely notification-driven
+# rather than the controller-style Modbus read request flow.
 
 class ShuntClient(BaseClient):
     def __init__(self, config, on_data_callback=None, on_error_callback=None):
@@ -14,7 +16,6 @@ class ShuntClient(BaseClient):
         self.NOTIFY_CHAR_UUID = "0000c411-0000-1000-8000-00805f9b34fb"
         self.WRITE_SERVICE_UUID = ""
         self.WRITE_CHAR_UUID = ""
-        self.READ_TIMEOUT = 30
 
         self.on_data_callback = on_data_callback
         self.on_error_callback = on_error_callback

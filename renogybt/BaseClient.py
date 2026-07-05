@@ -113,15 +113,20 @@ class BaseClient:
 
     async def read_section(self):
         index = self.section_index
-        if self.device_id == None or len(self.sections) == 0:
+        # check if device_id is set and if there are sections to read
+        if self.device_id == None:
             return logging.error("BaseClient cannot be used directly")
+
+        # shunt client is notification-driven, so no need to write anything
+        if not self.write_char_uuid or len(self.sections) == 0:
+            return logging.info("Nothing to write, skipping operation")
 
         self.read_timeout = self.loop.call_later(READ_TIMEOUT, self.on_read_timeout)
         request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words']) 
         await self.ble_manager.characteristic_write_value(request)
 
     def create_generic_read_request(self, device_id, function, regAddr, readWrd):                             
-        data = None                                
+        data = None
         if regAddr != None and readWrd != None:
             data = []
             data.append(device_id)
