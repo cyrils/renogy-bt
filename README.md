@@ -1,7 +1,7 @@
 # Renogy BT
 ![256924763-940c205e-738d-4a68-982f-1695c80bfed5](https://github.com/cyrils/renogy-bt/assets/5549113/bcdef6ec-efc9-44fd-af70-67165cf6862e)
 
-Cross-platform Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using  [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) type (RS232 or RS485)  bluetooth modules. Tested with **Rover** / **Wanderer** series charge controllers, but it might also work with other  "SRNE like" devices like Rich Solar, PowMr etc. See the list of [compatible devices](#compatibility). It can also upload data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
+Cross-platform Python library to read Renogy¹ Solar Charge Controllers and Smart Batteries using  [BT-1](https://www.renogy.com/bt-1-bluetooth-module-new-version/) or [BT-2](https://www.renogy.com/bt-2-bluetooth-module/) type (RS232 or RS485)  bluetooth modules. Tested mainly with **Renogy** brand products, but it might also work with other "SRNE like" devices like Rich Solar, PowMr etc. See the list of [compatible devices](#compatibility). It can also upload data to local **MQTT** broker, **PVOutput** cloud or your own custom server.
 
 ## Dependencies
 You will need [Python](https://www.python.org/downloads/) 3.6 or above in your system. In some platforms you may have to create python virtual environment. Then install dependencies by running the command:
@@ -63,7 +63,7 @@ INFO:root:BT-TH-XXXXXXXX => {'function': 'READ', 'model': 'RBC50D1S-G1', 'device
 
 ```
 # Smart Shunt output
-INFO:root:RTMShunt300XXXX => {'main_battery_percent': 100.0, 'main_battery_voltage': 12.91, 'starter_battery_voltage': 0.0, 'charge_amps': 0.02, 'charge_watts': 0.29, 'battery_temperature': 19.9, '__device': 'RTMShunt300XXXX', '__client': 'ShuntClient'}
+INFO:root:RTMShunt300XXXX => {'main_battery_percent': 100.0, 'main_battery_voltage': 13.21, 'starter_battery_voltage': 0.0, 'charge_amps': 0.02, 'charge_watts': 0.29, 'battery_temperature': 19.9, '__device': 'RTMShunt300XXXX', '__client': 'ShuntClient'}
 ```
 
 **Have multiple devices in Hub mode?**
