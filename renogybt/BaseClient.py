@@ -9,7 +9,7 @@ from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 # Should be extended by each client with its own parsers and section definitions
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
 
-ALIAS_PREFIXES = ['BT-TH', 'RNGRBP', 'BTRIC']
+ALIAS_PREFIXES = ['BT-TH', 'RNGRBP', 'BTRIC', 'RTMShunt', 'RNGRIU']
 WRITE_SERVICE_UUID = "0000ffd0-0000-1000-8000-00805f9b34fb"
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
@@ -44,7 +44,15 @@ class BaseClient:
             self.__on_error("KeyboardInterrupt")
 
     async def connect(self):
-        self.ble_manager = BLEManager(mac_address=self.config['device']['mac_addr'], alias=self.config['device']['alias'], on_data=self.on_data_received, on_connect_fail=self.__on_connect_fail, notify_char_uuid=NOTIFY_CHAR_UUID, write_char_uuid=WRITE_CHAR_UUID, write_service_uuid=WRITE_SERVICE_UUID)
+        self.ble_manager = BLEManager(
+            mac_address=self.config['device']['mac_addr'],
+            alias=self.config['device']['alias'],
+            on_data=self.on_data_received,
+            on_connect_fail=self.__on_connect_fail,
+            notify_char_uuid=getattr(self, 'NOTIFY_CHAR_UUID', NOTIFY_CHAR_UUID),
+            write_char_uuid=getattr(self, 'WRITE_CHAR_UUID', WRITE_CHAR_UUID),
+            write_service_uuid=getattr(self, 'WRITE_SERVICE_UUID', WRITE_SERVICE_UUID),
+        )
         await self.ble_manager.discover()
 
         if not self.ble_manager.device:
@@ -105,15 +113,20 @@ class BaseClient:
 
     async def read_section(self):
         index = self.section_index
-        if self.device_id == None or len(self.sections) == 0:
+        # check if device_id is set and if there are sections to read
+        if self.device_id == None:
             return logging.error("BaseClient cannot be used directly")
+
+        # shunt client is notification-driven, so no need to write anything
+        if not getattr(self, 'write_char_uuid', None) or len(self.sections) == 0:
+            return logging.info("Nothing to write, skipping operation")
 
         self.read_timeout = self.loop.call_later(READ_TIMEOUT, self.on_read_timeout)
         request = self.create_generic_read_request(self.device_id, 3, self.sections[index]['register'], self.sections[index]['words']) 
         await self.ble_manager.characteristic_write_value(request)
 
     def create_generic_read_request(self, device_id, function, regAddr, readWrd):                             
-        data = None                                
+        data = None
         if regAddr != None and readWrd != None:
             data = []
             data.append(device_id)
