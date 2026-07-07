@@ -40,25 +40,30 @@ DEBUG:root:create_read_request 256 => [255, 3, 1, 0, 0, 34, 209, 241]
 INFO:root:characteristic_write_value_succeeded
 INFO:root:characteristic_enable_notifications_succeeded
 INFO:root:on_data_received: response for read operation
-DEBUG:root:BT-TH-B00FXXXX => {'function': 'READ', 'model': 'RNG-CTRL-WND10', 'battery_percentage': 87, 'battery_voltage': 12.9, 'battery_current': 2.58, 'battery_temperature': 25, 'controller_temperature': 33, 'load_status': 'off', 'load_voltage': 0.0,'load_current': 0.0, 'load_power': 0, 'pv_voltage': 17.1, 'pv_current': 2.04, 'pv_power': 35, 'max_charging_power_today': 143, 'max_discharging_power_today': 0, 'charging_amp_hours_today': 34, 'discharging_amp_hours_today': 34, 'power_generation_today': 432, 'power_consumption_today': 0, 'power_generation_total': 426038, 'charging_status': 'mppt', 'battery_type': 'lithium', 'device_id': 97}
+INFO:root:BT-TH-B00FXXXX => {'function': 'READ', 'model': 'RNG-CTRL-WND10', 'battery_percentage': 87, 'battery_voltage': 12.9, 'battery_current': 2.58, 'battery_temperature': 25, 'controller_temperature': 33, 'load_status': 'off', 'load_voltage': 0.0,'load_current': 0.0, 'load_power': 0, 'pv_voltage': 17.1, 'pv_current': 2.04, 'pv_power': 35, 'max_charging_power_today': 143, 'max_discharging_power_today': 0, 'charging_amp_hours_today': 34, 'discharging_amp_hours_today': 34, 'power_generation_today': 432, 'power_consumption_today': 0, 'power_generation_total': 426038, 'charging_status': 'mppt', 'battery_type': 'lithium', 'device_id': 97}
 INFO:root:Exit: Disconnecting device: BT-TH-B00FXXXX [80:6F:B0:0F:XX:XX]
 ```
 ```
 # Rover historical data (7 days summary)
-DEBUG:root:BT-TH-30A3XXXX => {'function': 'READ', 'daily_power_generation': [1754, 1907, 1899, 1804, 1841, 1630, 1344],'daily_charge_ah': [135, 147, 147, 139, 142, 125, 102], 'daily_max_power': [234, 344, 360, 335, 331, 307, 290]}
+INFO:root:BT-TH-30A3XXXX => {'function': 'READ', 'daily_power_generation': [1754, 1907, 1899, 1804, 1841, 1630, 1344],'daily_charge_ah': [135, 147, 147, 139, 142, 125, 102], 'daily_max_power': [234, 344, 360, 335, 331, 307, 290]}
 ```
 ```
 # Battery output
-DEBUG:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'cell_count': 4, 'cell_voltage_0': 3.6, 'cell_voltage_1': 3.6, 'cell_voltage_2': 3.6, 'cell_voltage_3': 3.6, 'sensor_count': 4, 'temperature_0': 21.0, 'temperature_1': 21.0, 'temperature_2': 21.0, 'temperature_3': 21.0, 'current': 1.4, 'voltage': 14.5, 'remaining_charge': 99.941, 'capacity': 100.0, 'device_id': 48} 
+INFO:root:BT-TH-161EXXXX => {'function': 'READ', 'model': 'RBT100LFP12S-G', 'cell_count': 4, 'cell_voltage_0': 3.6, 'cell_voltage_1': 3.6, 'cell_voltage_2': 3.6, 'cell_voltage_3': 3.6, 'sensor_count': 4, 'temperature_0': 21.0, 'temperature_1': 21.0, 'temperature_2': 21.0, 'temperature_3': 21.0, 'current': 1.4, 'voltage': 14.5, 'remaining_charge': 99.941, 'capacity': 100.0, 'device_id': 48} 
 ```
 ```
 # Inverter output
-DEBUG:root:BTRIC13400XXXX => {'function': 'READ', 'input_voltage': 124.9, 'input_current': 2.2, 'output_voltage': 124.9, 'output_current': 1.19, 'output_frequency': 59.97, 'battery_voltage': 14.4, 'temperature': 30.0, 'input_frequency': 59.97, 'device_id': 32, 'model': 'RIV1230RCH-SPS', 'battery_percentage': 100, 'charging_current': 0.7, 'solar_voltage': 0.0, 'solar_current': 0.0, 'solar_power': 0, 'charging_status': 'deactivated', 'charging_power': 10, 'load_curent': 1.2, 'load_active_power': 108, 'load_apparent_power': 150, 'line_charging_current': 0.0, 'load_percentage': 5, '__device': 'BTRIC13400XXXX', '__client': 'InverterClient'}
+INFO:root:BTRIC13400XXXX => {'function': 'READ', 'input_voltage': 124.9, 'input_current': 2.2, 'output_voltage': 124.9, 'output_current': 1.19, 'output_frequency': 59.97, 'battery_voltage': 14.4, 'temperature': 30.0, 'input_frequency': 59.97, 'device_id': 32, 'model': 'RIV1230RCH-SPS', 'battery_percentage': 100, 'charging_current': 0.7, 'solar_voltage': 0.0, 'solar_current': 0.0, 'solar_power': 0, 'charging_status': 'deactivated', 'charging_power': 10, 'load_curent': 1.2, 'load_active_power': 108, 'load_apparent_power': 150, 'line_charging_current': 0.0, 'load_percentage': 5, '__device': 'BTRIC13400XXXX', '__client': 'InverterClient'}
 ```
 
 ```
 # DC Charger output
 INFO:root:BT-TH-XXXXXXXX => {'function': 'READ', 'model': 'RBC50D1S-G1', 'device_id': 96, 'battery_percentage': 100, 'battery_voltage': 13.2, 'combined_charge_current': 0.0, 'controller_temperature': 18, 'battery_temperature': 25, 'alternator_voltage': 12.9, 'alternator_current': 0.0, 'alternator_power': 0, 'pv_voltage': 0.0, 'pv_current': 0.0, 'pv_power': 0, 'battery_min_voltage_today': 13.2, 'battery_max_voltage_today': 13.3, 'battery_max_current_today': 17.02, 'max_charging_power_today': 238, 'charging_amp_hours_today': 25, 'power_generation_today': 336, 'total_working_days': 703, 'count_battery_overdischarged': 0, 'count_battery_fully_charged': 1435, 'battery_ah_total_accumulated': 5607, 'power_generation_total': 76580, 'charging_status': 'current limiting', 'error': 'battery_over_discharge', 'battery_type': None, '__device': 'BT-TH-XXXXXXXX', '__client': 'DCChargerClient'}
+```
+
+```
+# Smart Shunt output
+INFO:root:RTMShunt300XXXX => {'main_battery_percent': 100.0, 'main_battery_voltage': 12.91, 'starter_battery_voltage': 0.0, 'charge_amps': 0.02, 'charge_watts': 0.29, 'battery_temperature': 19.9, '__device': 'RTMShunt300XXXX', '__client': 'ShuntClient'}
 ```
 
 **Have multiple devices in Hub mode?**
@@ -85,8 +90,10 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 | Renogy RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE) | Battery | - | ✅ |
 | Renogy RBT12100LFP-BT / RBT12200LFP-BT (Pro Series) | Battery | - | ✅ |
 | Renogy RIV4835CSH1S | Inverter | BT-2 | ✅ |
-| Renogy Rego RIV1230RCH (Built-in BLE) | Inverter | - | ✅ |
-| Renogy Smart Shunt | Shunt | - | ❌ |
+| Renogy Rego RIV1230RCH / RIV1220PU (Built-in BLE) | Inverter | - | ✅ |
+| Renogy Smart Shunt* | Shunt | - | ✅ |
+
+*Basic support only for smart shunt. Polling feature may not work.
 
 ## Data logging
 

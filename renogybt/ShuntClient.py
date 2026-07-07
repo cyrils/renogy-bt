@@ -24,7 +24,7 @@ class ShuntClient(BaseClient):
         self.throttle_timer = time.perf_counter() - self.throttle_timer_len - 1
 
     async def on_data_received(self, response):
-        logger.info("ShuntClient.on_data_received")
+        logger.debug("ShuntClient.on_data_received")
         operation = bytes_to_int(response, 1, 1)
 
         if (time.perf_counter() - self.throttle_timer) <= self.throttle_timer_len:
@@ -33,7 +33,7 @@ class ShuntClient(BaseClient):
         self.throttle_timer = time.perf_counter()
 
         if operation != SHUNT_READ_SUCCESS:
-            logger.info("Ignoring shunt notification with operation=%s", operation)
+            logger.debug("Ignoring shunt notification with operation=%s", operation)
             return
 
         self.data = self.parse_shunt_info(response)

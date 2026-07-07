@@ -9,7 +9,7 @@ from .Utils import bytes_to_int, crc16_modbus, int_to_bytes
 # Should be extended by each client with its own parsers and section definitions
 # Section example: {'register': 5000, 'words': 8, 'parser': self.parser_func}
 
-ALIAS_PREFIXES = ['BT-TH', 'RNGRBP', 'BTRIC']
+ALIAS_PREFIXES = ['BT-TH', 'RNGRBP', 'BTRIC', 'RTMShunt', 'RNGRIU']
 WRITE_SERVICE_UUID = "0000ffd0-0000-1000-8000-00805f9b34fb"
 NOTIFY_CHAR_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
 WRITE_CHAR_UUID  = "0000ffd1-0000-1000-8000-00805f9b34fb"
@@ -118,7 +118,7 @@ class BaseClient:
             return logging.error("BaseClient cannot be used directly")
 
         # shunt client is notification-driven, so no need to write anything
-        if not self.write_char_uuid or len(self.sections) == 0:
+        if not getattr(self, 'write_char_uuid', None) or len(self.sections) == 0:
             return logging.info("Nothing to write, skipping operation")
 
         self.read_timeout = self.loop.call_later(READ_TIMEOUT, self.on_read_timeout)
