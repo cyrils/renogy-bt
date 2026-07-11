@@ -13,9 +13,9 @@ class ShuntClient(BaseClient):
     def __init__(self, config, on_data_callback=None, on_error_callback=None):
         super().__init__(config)
 
-        self.NOTIFY_CHAR_UUID = "0000c411-0000-1000-8000-00805f9b34fb"
-        self.WRITE_SERVICE_UUID = ""
-        self.WRITE_CHAR_UUID = ""
+        self.notify_char_uuid = "0000c411-0000-1000-8000-00805f9b34fb"
+        self.write_service_uuid = ""
+        self.write_char_uuid = ""
 
         self.on_data_callback = on_data_callback
         self.on_error_callback = on_error_callback

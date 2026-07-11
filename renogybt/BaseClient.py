@@ -29,6 +29,9 @@ class BaseClient:
         self.sections = []
         self.section_index = 0
         self.loop = None
+        self.write_service_uuid = getattr(self, 'write_service_uuid', WRITE_SERVICE_UUID)
+        self.write_char_uuid = getattr(self, 'write_char_uuid', WRITE_CHAR_UUID)
+        self.notify_char_uuid = getattr(self, 'notify_char_uuid', NOTIFY_CHAR_UUID)
         logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
 
     def start(self):
@@ -49,9 +52,9 @@ class BaseClient:
             alias=self.config['device']['alias'],
             on_data=self.on_data_received,
             on_connect_fail=self.__on_connect_fail,
-            notify_char_uuid=getattr(self, 'NOTIFY_CHAR_UUID', NOTIFY_CHAR_UUID),
-            write_char_uuid=getattr(self, 'WRITE_CHAR_UUID', WRITE_CHAR_UUID),
-            write_service_uuid=getattr(self, 'WRITE_SERVICE_UUID', WRITE_SERVICE_UUID),
+            notify_char_uuid=self.notify_char_uuid,
+            write_char_uuid=self.write_char_uuid,
+            write_service_uuid=self.write_service_uuid,
         )
         await self.ble_manager.discover()
 
