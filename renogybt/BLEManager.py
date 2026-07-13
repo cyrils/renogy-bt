@@ -6,11 +6,12 @@ from bleak import BleakClient, BleakScanner, BLEDevice
 DISCOVERY_TIMEOUT = 5 # max wait time to complete the bluetooth scanning (seconds)
 
 class BLEManager:
-    def __init__(self, mac_address, alias, on_data, on_connect_fail, write_service_uuid, notify_char_uuid, write_char_uuid):
+    def __init__(self, mac_address, alias, on_data, on_connect_fail, on_disconnect, write_service_uuid, notify_char_uuid, write_char_uuid):
         self.mac_address = mac_address
         self.device_alias = alias
         self.data_callback = on_data
         self.connect_fail_callback = on_connect_fail
+        self.disconnect_callback = on_disconnect
         self.write_service_uuid = write_service_uuid
         self.notify_char_uuid = notify_char_uuid
         self.write_char_uuid = write_char_uuid
@@ -18,6 +19,7 @@ class BLEManager:
         self.device: BLEDevice = None
         self.client: BleakClient = None
         self.discovered_devices = []
+        self._intentional_disconnect = False
 
     async def discover(self):
         mac_address = self.mac_address.upper()
@@ -33,7 +35,8 @@ class BLEManager:
     async def connect(self):
         if not self.device: return logging.error("No device connected!")
 
-        self.client = BleakClient(self.device)
+        self._intentional_disconnect = False
+        self.client = BleakClient(self.device, disconnected_callback=self._on_disconnected)
         try:
             await self.client.connect()
             logging.info(f"Client connection: {self.client.is_connected}")
@@ -52,6 +55,14 @@ class BLEManager:
             logging.error(f"Error connecting to device")
             self.connect_fail_callback(sys.exc_info())
 
+    def _on_disconnected(self, client):
+        if self._intentional_disconnect:
+            logging.info("Disconnected intentionally.")
+        else:
+            logging.warning(f"Unexpected disconnect from device: {client.address}")
+            if self.disconnect_callback:
+                self.disconnect_callback()
+
     async def notification_callback(self, characteristic, data: bytearray):
         logging.info("notification_callback")
         await self.data_callback(data)
@@ -66,6 +77,8 @@ class BLEManager:
             logging.info(f'characteristic_write_value failed {e}')
 
     async def disconnect(self):
-        if self.client and self.client.is_connected:
-            logging.info(f"Exit: Disconnecting device: {self.device.name} {self.device.address}")
-            await self.client.disconnect()
+        if self.client:
+            self._intentional_disconnect = True
+            if self.client.is_connected:
+                logging.info(f"Exit: Disconnecting device: {self.device.name} {self.device.address}")
+                await self.client.disconnect()

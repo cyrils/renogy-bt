@@ -32,6 +32,9 @@ class BaseClient:
         self.write_service_uuid = getattr(self, 'write_service_uuid', WRITE_SERVICE_UUID)
         self.write_char_uuid = getattr(self, 'write_char_uuid', WRITE_CHAR_UUID)
         self.notify_char_uuid = getattr(self, 'notify_char_uuid', NOTIFY_CHAR_UUID)
+        self._retry_count = 0
+        self._reconnecting = False
+        self.max_retry = self.config['device'].getint('max_retry', fallback=3)
         logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
 
     def start(self):
@@ -52,6 +55,7 @@ class BaseClient:
             alias=self.config['device']['alias'],
             on_data=self.on_data_received,
             on_connect_fail=self.__on_connect_fail,
+            on_disconnect=self.__on_disconnect,
             notify_char_uuid=self.notify_char_uuid,
             write_char_uuid=self.write_char_uuid,
             write_service_uuid=self.write_service_uuid,
@@ -63,13 +67,18 @@ class BaseClient:
             for dev in self.ble_manager.discovered_devices:
                 if dev.name != None and dev.name.startswith(tuple(ALIAS_PREFIXES)):
                     logging.info(f"Possible device found! ====> {dev.name} > [{dev.address}]")
-            self.stop()
+            if self.loop and self.loop.is_running():
+                self.loop.create_task(self.__handle_retry_async("Device not found during discovery"))
+            return
         else:
             await self.ble_manager.connect()
-            if self.ble_manager.client and self.ble_manager.client.is_connected: await self.read_section()
+            if self.ble_manager.client and self.ble_manager.client.is_connected:
+                self._retry_count = 0
+                await self.read_section()
 
     async def disconnect(self):
-        await self.ble_manager.disconnect()
+        if self.ble_manager:
+            await self.ble_manager.disconnect()
         self.future.set_result('DONE')
 
     async def on_data_received(self, response):
@@ -107,7 +116,8 @@ class BaseClient:
 
     def on_read_timeout(self):
         logging.error("on_read_timeout => Timed out! Please check your device_id!")
-        self.stop()
+        if self.loop and self.loop.is_running():
+            self.loop.create_task(self.__handle_retry_async("Read timeout"))
 
     async def check_polling(self):
         if self.config['data'].getboolean('enable_polling'): 
@@ -152,8 +162,41 @@ class BaseClient:
 
     def __on_connect_fail(self, error):
         logging.error(f"Connection failed: {error}")
-        self.__safe_callback(self.on_error_callback, error)
-        self.stop()
+        if self.loop and self.loop.is_running():
+            self.loop.create_task(self.__handle_retry_async(f"Connection failed: {error}"))
+
+    def __on_disconnect(self):
+        logging.warning("Unexpected disconnect callback received.")
+        if self.loop and self.loop.is_running():
+            self.loop.create_task(self.__handle_retry_async("Unexpected disconnect"))
+
+    async def __handle_retry_async(self, reason):
+        if self._reconnecting:
+            logging.debug("Retry or reconnect already in progress, ignoring duplicate trigger.")
+            return
+        self._reconnecting = True
+        try:
+            if self._retry_count < self.max_retry:
+                self._retry_count += 1
+                delay = 2 ** self._retry_count
+                logging.info(f"Retrying connection in {delay} seconds (Attempt {self._retry_count}/{self.max_retry}). Reason: {reason}")
+                if self.read_timeout and not self.read_timeout.cancelled():
+                    self.read_timeout.cancel()
+                    
+                if self.ble_manager:
+                    try:
+                        await self.ble_manager.disconnect()
+                    except Exception as e:
+                        logging.debug(f"Error disconnecting manager client during retry setup: {e}")
+                        
+                await asyncio.sleep(delay)
+                await self.connect()
+            else:
+                logging.error(f"Max retries ({self.max_retry}) reached. Reason: {reason}. Stopping client.")
+                self.__safe_callback(self.on_error_callback, f"Max retries reached: {reason}")
+                self.stop()
+        finally:
+            self._reconnecting = False
 
     def stop(self):
         if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
