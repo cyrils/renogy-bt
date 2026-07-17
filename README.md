@@ -87,10 +87,10 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 | SRNE ML24/ML48 Series | Controller | BT-1 | ✅ |
 | RICH SOLAR 20/40/60 | Controller | BT-1 | ✅ |
 | Renogy RBT100LFP12S / RBT50LFP48S | Battery | BT-2 | ✅ |
-| Renogy RBT100LFP12-BT / RBT200LFP12-BT (Built-in BLE) | Battery | - | ✅ |
+| Renogy RBT100LFP12-BT / RBT200LFP12-BT | Battery | - | ✅ |
 | Renogy RBT12100LFP-BT / RBT12200LFP-BT (Pro Series) | Battery | - | ✅ |
 | Renogy RIV4835CSH1S | Inverter | BT-2 | ✅ |
-| Renogy Rego RIV1230RCH / RIV1220PU (Built-in BLE) | Inverter | - | ✅ |
+| Renogy Rego RIV1230RCH / RIV1220PU / RIV1230PU | Inverter | - | ✅ |
 | Renogy Smart Shunt* | Shunt | - | ✅ |
 
 *Basic support only for smart shunt. Polling feature may not work.
