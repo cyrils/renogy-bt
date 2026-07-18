@@ -93,7 +93,7 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 | Renogy Rego RIV1230RCH / RIV1220PU / RIV1230PU | Inverter | - | ✅ |
 | Renogy Smart Shunt* | Shunt | - | ✅ |
 
-*Basic support only for smart shunt. Polling feature may not work.
+_*Experimental support for smart shunt_
 
 ## Data logging
 
