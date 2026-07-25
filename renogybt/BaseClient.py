@@ -37,9 +37,17 @@ class BaseClient:
         self.max_retry = self.config['device'].getint('max_retry', fallback=3)
         logging.info(f"Init {self.__class__.__name__}: {self.config['device']['alias']} => {self.config['device']['mac_addr']}")
 
+    def _get_or_create_loop(self):
+        try:
+            return asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            return loop
+
     def start(self):
         try:
-            self.loop = asyncio.get_event_loop()
+            self.loop = self._get_or_create_loop()
             self.loop.create_task(self.connect())
             self.future = self.loop.create_future()
             self.loop.run_until_complete(self.future)
@@ -201,7 +209,7 @@ class BaseClient:
     def stop(self):
         if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
         if self.loop is None:
-            self.loop = asyncio.get_event_loop()
+            self.loop = self._get_or_create_loop()
             self.loop.create_task(self.disconnect())
             self.future = self.loop.create_future()
             self.loop.run_until_complete(self.future)

@@ -117,3 +117,23 @@ class TestRetryLogic(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(client._retry_count, 5)
                 called_delays = [call[0][0] for call in mock_sleep_spy.call_args_list if call[0][0] > 0]
                 self.assertEqual(called_delays, [2, 4, 8, 16, 32])
+
+    @patch('asyncio.get_event_loop')
+    @patch('asyncio.new_event_loop')
+    @patch('asyncio.set_event_loop')
+    def test_get_or_create_loop_fallback(self, mock_set_loop, mock_new_loop, mock_get_loop):
+        mock_get_loop.side_effect = RuntimeError("No current event loop")
+        mock_new_loop.return_value = "mocked_loop"
+        
+        cfg = configparser.ConfigParser()
+        cfg.read_dict({
+            "device": {"device_id": "255", "alias": "BT-TH-TEST", "mac_addr": "AA:BB:CC:DD:EE:FF"},
+            "data": {"poll_interval": "60", "enable_polling": "false"},
+        })
+        client = ShuntClient(cfg)
+        loop = client._get_or_create_loop()
+        
+        mock_get_loop.assert_called_once()
+        mock_new_loop.assert_called_once()
+        mock_set_loop.assert_called_once_with("mocked_loop")
+        self.assertEqual(loop, "mocked_loop")
