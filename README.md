@@ -90,10 +90,11 @@ If you have multiple devices connected to a single BT-2 module (daisy chained or
 | Renogy RBT100LFP12-BT / RBT200LFP12-BT | Battery | - | ✅ |
 | Renogy RBT12100LFP-BT / RBT12200LFP-BT (Pro Series) | Battery | - | ✅ |
 | Renogy RIV4835CSH1S | Inverter | BT-2 | ✅ |
+| Renogy RIV1230PCH-23S (HF)* | Inverter | BT-2 | ✅ |
 | Renogy Rego RIV1230RCH / RIV1220PU / RIV1230PU | Inverter | - | ✅ |
 | Renogy Smart Shunt* | Shunt | - | ✅ |
 
-_*Experimental support for smart shunt_
+_*Experimental support for Smart Shunt and HF Inverter_
 
 ## Data logging
 

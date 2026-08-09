@@ -1,3 +1,7 @@
+# Based on the register map by john-in-france
+# Repository: https://github.com/john-in-france/renogy-riv-ble-bridge
+# Original Discussion: https://github.com/cyrils/renogy-bt/discussions/136
+
 from .BaseClient import BaseClient
 from .Utils import bytes_to_int, format_temperature
 
