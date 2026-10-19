@@ -23,6 +23,18 @@ class BLEManager:
 
     async def discover(self):
         mac_address = self.mac_address.upper()
+        if mac_address:
+            # a lookup by address returns as soon as the device advertises, a scan always takes DISCOVERY_TIMEOUT
+            logging.info(f"Looking up device by address {mac_address}...")
+            try:
+                self.device = await BleakScanner.find_device_by_address(mac_address, timeout=DISCOVERY_TIMEOUT)
+            except Exception as e:
+                logging.warning(f"Lookup by address failed: {e}")
+            if self.device:
+                logging.info(f"Found device by address {self.device.name} => {self.device.address}")
+                return
+            logging.info("Device not found by address, falling back to a scan")
+
         logging.info("Starting discovery...")
         self.discovered_devices = await BleakScanner.discover(timeout=DISCOVERY_TIMEOUT)
         logging.info("Devices found: %s", len(self.discovered_devices))
