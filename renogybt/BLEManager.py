@@ -81,4 +81,8 @@ class BLEManager:
             self._intentional_disconnect = True
             if self.client.is_connected:
                 logging.info(f"Exit: Disconnecting device: {self.device.name} {self.device.address}")
-                await self.client.disconnect()
+                try:
+                    await self.client.disconnect()
+                except Exception as e:
+                    # e.g. EOFError, when BlueZ closes the D-Bus connection before it replies
+                    logging.warning(f"Disconnect failed during teardown: {e!r}")

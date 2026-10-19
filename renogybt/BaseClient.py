@@ -85,9 +85,12 @@ class BaseClient:
                 await self.read_section()
 
     async def disconnect(self):
-        if self.ble_manager:
-            await self.ble_manager.disconnect()
-        self.future.set_result('DONE')
+        try:
+            if self.ble_manager:
+                await self.ble_manager.disconnect()
+        finally:
+            # always release start(), which waits on this future
+            if not self.future.done(): self.future.set_result('DONE')
 
     async def on_data_received(self, response):
         if self.read_timeout and not self.read_timeout.cancelled(): self.read_timeout.cancel()
